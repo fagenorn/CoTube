@@ -9,7 +9,9 @@
 
 namespace YoutubeLibrary
 {
+    using System;
     using System.Collections.Specialized;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     using HtmlAgilityPack;
@@ -19,6 +21,11 @@ namespace YoutubeLibrary
     /// </summary>
     internal static class DomParser
     {
+        /// <summary>
+        ///     The random generator.
+        /// </summary>
+        private static readonly Random Random = new Random();
+
         /// <summary>
         ///     Get action from form id.
         /// </summary>
@@ -37,6 +44,27 @@ namespace YoutubeLibrary
             document.LoadHtml(htmlDocument);
             var form = document.GetElementbyId(id);
             return form.Attributes["action"].Value;
+        }
+
+        /// <summary>
+        ///     Get BotGuard code.
+        /// </summary>
+        /// <param name="htmlDocument">
+        ///     The html document.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="string" />.
+        /// </returns>
+        public static string GetBotguardCode(this string htmlDocument)
+        {
+            const string Letters = "abcdefghijklmnopqrstuvwxyz";
+            var sb = new StringBuilder();
+            for (var index = 0; index < 30; index++)
+            {
+                sb.Append(Letters[Random.Next(Letters.Length - 1)]);
+            }
+
+            return "!v7ylvLkPAAMRAACZAdhZ5tDJmm9kt08Jc1HSFEdOqKIRufjYBS0+5y9BA6bUseOsjEm2TqTuu/IAJ07u+QLGNcPa5+" + sb;
         }
 
         /// <summary>
@@ -156,6 +184,21 @@ namespace YoutubeLibrary
         public static string GetVideoParam(this string htmlDocument)
         {
             return RegexGetMatch("data-simplebox-params=\\\\\"(.*?)\\\\\"", htmlDocument);
+        }
+
+        /// <summary>
+        ///     The get BotGuard url.
+        /// </summary>
+        /// <param name="htmlDocument">
+        ///     The html document.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="string" />.
+        /// </returns>
+        // ReSharper disable once UnusedMember.Local
+        private static string GetBotguardUrl(this string htmlDocument)
+        {
+            return RegexGetMatch("COMMENTS_BG_IU\', \\\\\"(.*?)\\\\\"\\)", htmlDocument);
         }
 
         /// <summary>

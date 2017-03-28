@@ -77,17 +77,14 @@ namespace YoutubeLibrary
                                                Method.Post,
                                                $"session_token={sessionToken}");
             var videoParam = watchResponse.GetVideoParam();
+            watchResponse.GetBotguardCode();
 
             var body = new NameValueCollection
                            {
                                { "content", comment },
                                { "params", videoParam },
-                               { "bgr", string.Empty },
+                               { "bgr", watchResponse.GetBotguardCode() },
                                { "session_token", sessionToken }
-
-                               // bgr => window.botguard.bg( _yt_www.D("REPLACE WITH COMMENTS_BG_P")).invoke()
-                               // COMMENTS_BG_P can be retrieved from VideoWatchUrl
-                               // source => https://github.com/XueSeason/Hacker/issues/2
                            };
 
             var commentId = this.http.SimpleYoutubeRequest(Constants.PostCommentUrl, body).GetCommentId();

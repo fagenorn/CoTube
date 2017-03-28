@@ -25,12 +25,12 @@ namespace YoutubeLibraryTest
         [TestMethod]
         public void CommentOnVideo()
         {
-            const string Email = "stephenmcclellan36@gmail.com";
-            const string Password = "KuCobof23%";
+            const string Email = "donaldducktrumpmaker@gmail.com";
+            const string Password = "celementoni";
             var account = new YAccount(Email, Password);
-            const string VideoUrl = "https://www.youtube.com/watch?v=2Xz_7tCVgoY";
+            const string VideoUrl = "https://www.youtube.com/watch?v=ZeBrnuQxEsQ";
             account.Login();
-            var response = account.Comment(VideoUrl, "Damn, that is some nice shit.");
+            var response = account.Comment(VideoUrl, "Relaxing mix :P");
 
             Assert.IsTrue(response.Success);
             Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));
