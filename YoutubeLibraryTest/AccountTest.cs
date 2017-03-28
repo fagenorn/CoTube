@@ -30,7 +30,7 @@ namespace YoutubeLibraryTest
             var account = new YAccount(Email, Password);
             const string VideoUrl = "https://www.youtube.com/watch?v=ZeBrnuQxEsQ";
             account.Login();
-            var response = account.Comment(VideoUrl, "Relaxing mix :P");
+            var response = account.Comment(VideoUrl, "LoL, I can't stop listening.");
 
             Assert.IsTrue(response.Success);
             Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));

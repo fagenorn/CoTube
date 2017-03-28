@@ -47,9 +47,25 @@ namespace YoutubeLibrary
         private HttpWebRequest request;
 
         /// <summary>
+        ///     Initializes a new instance of the <see cref="Http" /> class.
+        /// </summary>
+        /// <param name="proxy">
+        ///     The proxy.
+        /// </param>
+        public Http(Proxy proxy)
+        {
+            this.Proxy = proxy;
+        }
+
+        /// <summary>
         ///     Gets the cookies.
         /// </summary>
         public CookieContainer Cookies { get; } = new CookieContainer();
+
+        /// <summary>
+        ///     Gets the proxy.
+        /// </summary>
+        public Proxy Proxy { get; }
 
         /// <summary>
         ///     Gets the user agent.
@@ -155,7 +171,6 @@ namespace YoutubeLibrary
             this.request.Headers.Add("Accept-Encoding", "gzip, deflate, br");
             this.request.Headers.Add("Accept-Language", "en-US,en;q=0.8,nl;q=0.6");
             this.request.Headers.Add("DNT", "1");
-
             foreach (string header in this.extraHeaders.Keys)
             {
                 this.request.Headers.Add(header, this.extraHeaders[header]);
@@ -164,6 +179,31 @@ namespace YoutubeLibrary
             this.extraHeaders.Clear();
             this.request.AllowAutoRedirect = true;
             this.request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            this.request.Proxy = this.SetupProxy();
+        }
+
+        /// <summary>
+        ///     Setup proxy.
+        /// </summary>
+        /// <returns>
+        ///     The <see cref="IWebProxy" />.
+        /// </returns>
+        private IWebProxy SetupProxy()
+        {
+            if (!this.Proxy.HasProxy)
+            {
+                return null;
+            }
+
+            var webProxy = new WebProxy(this.Proxy.GetProxyFormated(), true);
+            if (!this.Proxy.HasCredentials)
+            {
+                return webProxy;
+            }
+
+            var credentials = this.Proxy.Credentials;
+            webProxy.Credentials = new NetworkCredential(credentials.Username, credentials.Password);
+            return webProxy;
         }
     }
 }

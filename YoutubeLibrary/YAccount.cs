@@ -22,7 +22,12 @@ namespace YoutubeLibrary
         /// <summary>
         ///     The http object.
         /// </summary>
-        private readonly Http http = new Http();
+        private readonly Http http;
+
+        /// <summary>
+        ///     The proxy.
+        /// </summary>
+        private readonly Proxy proxy = new Proxy();
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="YAccount" /> class.
@@ -37,6 +42,7 @@ namespace YoutubeLibrary
         {
             this.Email = email;
             this.Password = password;
+            this.http = new Http(this.proxy);
         }
 
         /// <summary>

@@ -42,9 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Credentials.cs" />
     <Compile Include="DomParser.cs" />
     <Compile Include="Http.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxy.cs" />
     <Compile Include="Response\CommentResponse.cs" />
     <Compile Include="UserAgent.cs" />
     <Compile Include="YAccount.cs" />
