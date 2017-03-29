@@ -28,7 +28,7 @@ namespace YoutubeLibraryTest
             const string Email = "donaldducktrumpmaker@gmail.com";
             const string Password = "celementoni";
             var account = new YAccount(Email, Password);
-            const string VideoUrl = "https://www.youtube.com/watch?v=ZeBrnuQxEsQ";
+            const string VideoUrl = "https://www.youtube.com/watch?v=xt544bCPqAw";
             account.Login();
             var response = account.Comment(VideoUrl, "LoL, I can't stop listening.");
 

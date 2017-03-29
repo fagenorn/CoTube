@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeLibrary", "YoutubeLi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeLibraryTest", "YoutubeLibraryTest\YoutubeLibraryTest.csproj", "{AA94C0DD-9838-4CFB-8263-08F2886087FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoTubeAccountManager", "CoTubeAccountManager\CoTubeAccountManager.csproj", "{631165B1-F577-4896-980B-2A07A5583044}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AA94C0DD-9838-4CFB-8263-08F2886087FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA94C0DD-9838-4CFB-8263-08F2886087FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA94C0DD-9838-4CFB-8263-08F2886087FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{631165B1-F577-4896-980B-2A07A5583044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{631165B1-F577-4896-980B-2A07A5583044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{631165B1-F577-4896-980B-2A07A5583044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{631165B1-F577-4896-980B-2A07A5583044}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
