@@ -44,6 +44,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Gram-MultiTool-2\UsefullUtilitiesLibrary\UsefullUtilitiesLibrary.csproj">
+      <Project>{2d967ede-0396-40d8-9c14-69a87e38e45a}</Project>
+      <Name>UsefullUtilitiesLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\YoutubeLibrary\YoutubeLibrary.csproj">
       <Project>{e987c437-9b1d-44f5-ade5-a6cf7b276ca6}</Project>
       <Name>YoutubeLibrary</Name>
