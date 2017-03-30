@@ -94,7 +94,12 @@ namespace YoutubeLibrary
                            };
 
             var commentId = this.http.SimpleYoutubeRequest(Constants.PostCommentUrl, body).GetCommentId();
-            return new CommentResponse { Success = true, CommentId = commentId };
+            return new CommentResponse
+                       {
+                           Success = true,
+                           CommentId = commentId,
+                           CommentLink = $"https://www.youtube.com/watch?v={videoCode}&lc={commentId}"
+                       };
         }
 
         /// <summary>

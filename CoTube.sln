@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoTubeAccountManager", "CoT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsefullUtilitiesLibrary", "..\Gram-MultiTool-2\UsefullUtilitiesLibrary\UsefullUtilitiesLibrary.csproj", "{2D967EDE-0396-40D8-9C14-69A87E38E45A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoTubeAccountManagerTest", "CoTubeAccountManagerTest\CoTubeAccountManagerTest.csproj", "{3F8E9E9D-6708-49F0-B814-ED1622E4A108}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2D967EDE-0396-40D8-9C14-69A87E38E45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D967EDE-0396-40D8-9C14-69A87E38E45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D967EDE-0396-40D8-9C14-69A87E38E45A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F8E9E9D-6708-49F0-B814-ED1622E4A108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F8E9E9D-6708-49F0-B814-ED1622E4A108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F8E9E9D-6708-49F0-B814-ED1622E4A108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F8E9E9D-6708-49F0-B814-ED1622E4A108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -60,17 +60,17 @@ namespace YoutubeLibrary
         /// <summary>
         ///     Gets the cookies.
         /// </summary>
-        public CookieContainer Cookies { get; } = new CookieContainer();
+        private CookieContainer Cookies { get; } = new CookieContainer();
 
         /// <summary>
         ///     Gets the proxy.
         /// </summary>
-        public Proxy Proxy { get; }
+        private Proxy Proxy { get; }
 
         /// <summary>
         ///     Gets the user agent.
         /// </summary>
-        public string Useragent { get; } = UserAgent.GenerateUseragent();
+        private string Useragent { get; } = UserAgent.GenerateUseragent();
 
         /// <summary>
         ///     Add header.

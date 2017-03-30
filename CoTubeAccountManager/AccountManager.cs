@@ -9,9 +9,7 @@
 
 namespace CoTubeAccountManager
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using UsefullUtilitiesLibrary;
 
@@ -22,6 +20,16 @@ namespace CoTubeAccountManager
     /// </summary>
     internal static class AccountManager
     {
+        /// <summary>
+        ///     Gets or sets the panel password.
+        /// </summary>
+        public static string PanelPassword { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the panel username.
+        /// </summary>
+        public static string PanelUsername { get; set; }
+
         /// <summary>
         ///     Gets the accounts.
         /// </summary>
@@ -49,14 +57,36 @@ namespace CoTubeAccountManager
         }
 
         /// <summary>
+        ///     Add new comment range.
+        /// </summary>
+        /// <param name="comments">
+        ///     The comments.
+        /// </param>
+        public static void AddNewCommentRange(IEnumerable<string> comments)
+        {
+            Comments.AddRange(comments);
+        }
+
+        /// <summary>
         ///     Add a YouTube URL to comment on.
         /// </summary>
         /// <param name="url">
-        ///     The url.
+        ///     The URL.
         /// </param>
         public static void AddYoutubeUrl(string url)
         {
             Urls.Add(url);
+        }
+
+        /// <summary>
+        ///     Add YouTube URL range.
+        /// </summary>
+        /// <param name="urls">
+        ///     The URLs.
+        /// </param>
+        public static void AddYoutubeUrlRange(IEnumerable<string> urls)
+        {
+            Urls.AddRange(urls);
         }
 
         /// <summary>
@@ -96,16 +126,33 @@ namespace CoTubeAccountManager
                     var commentResponse = account.Comment(urlToComment, comment.SpinIt());
                     if (commentResponse.Success)
                     {
-                        SubmitCommentId(commentResponse.CommentId);
+                        SubmitCommentId(commentResponse.CommentLink);
                     }
-                    toCommentList.FirstOrDefault(x => x = comment)
+
+                    toCommentList.Remove(comment);
                 }
             }
         }
 
-        private static void SubmitCommentId(string commentId)
+        /// <summary>
+        ///     Submit comment link to receive up-votes.
+        /// </summary>
+        /// <param name="commentLink">
+        ///     The comment link.
+        /// </param>
+        private static void SubmitCommentId(string commentLink)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(PanelUsername))
+            {
+                return;
+            }
+
+            if (!UpvoteManager.IsLoggedIn)
+            {
+                UpvoteManager.Login(PanelUsername, PanelPassword);
+            }
+
+            UpvoteManager.SubmitUpvoteRequest(commentLink, 15);
         }
     }
 }
