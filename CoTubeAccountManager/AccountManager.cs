@@ -10,40 +10,60 @@
 namespace CoTubeAccountManager
 {
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using System.Threading;
 
     using UsefullUtilitiesLibrary;
+    using UsefullUtilitiesLibrary.CustomList;
 
     using YoutubeLibrary;
 
     /// <summary>
     ///     The account manager.
     /// </summary>
-    internal static class AccountManager
+    public class AccountManager
     {
-        /// <summary>
-        ///     Gets or sets the panel password.
-        /// </summary>
-        public static string PanelPassword { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the panel username.
-        /// </summary>
-        public static string PanelUsername { get; set; }
-
         /// <summary>
         ///     Gets the accounts.
         /// </summary>
-        private static List<YAccount> Accounts { get; } = new List<YAccount>();
+        public static ObservableCollection<YAccount> Accounts { get; } =
+            new ObservableCollection<YAccount>(new List<YAccount>());
+
+        /// <summary>
+        ///     Gets or sets the cancellation token source.
+        /// </summary>
+        public static CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
 
         /// <summary>
         ///     Gets the comments list.
         /// </summary>
-        private static List<string> Comments { get; } = new List<string>();
+        public static ObservableCollectionExt<string> Comments { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
         ///     Gets the URLs to comment on.
         /// </summary>
-        private static List<string> Urls { get; } = new List<string>();
+        public static ObservableCollectionExt<string> Urls { get; } = new ObservableCollectionExt<string>();
+
+        /// <summary>
+        ///     Gets or sets the panel password.
+        /// </summary>
+        public string PanelPassword { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the panel up-vote amount.
+        /// </summary>
+        public int PanelUpvoteAmount { get; set; } = 15;
+
+        /// <summary>
+        ///     Gets or sets the panel username.
+        /// </summary>
+        public string PanelUsername { get; set; }
+
+        /// <summary>
+        ///     The delay between each comment in milliseconds.
+        /// </summary>
+        private static int DelayBetweenEachComment => 6000;
 
         /// <summary>
         ///     Add new comment.
@@ -103,11 +123,12 @@ namespace CoTubeAccountManager
         /// <summary>
         ///     Start the commenting process.
         /// </summary>
-        public static void StartCommentingProcess()
+        public void StartCommentingProcess()
         {
-            var toCommentList = Urls;
+            var toCommentList = Urls.ToList();
             foreach (var account in Accounts)
             {
+                CancellationTokenSource.Token.ThrowIfCancellationRequested();
                 account.Login();
                 if (!account.IsLoggedIn())
                 {
@@ -126,10 +147,11 @@ namespace CoTubeAccountManager
                     var commentResponse = account.Comment(urlToComment, comment.SpinIt());
                     if (commentResponse.Success)
                     {
-                        SubmitCommentId(commentResponse.CommentLink);
+                        this.SubmitCommentId(commentResponse.CommentLink);
                     }
 
-                    toCommentList.Remove(comment);
+                    toCommentList.Remove(urlToComment);
+                    CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
                 }
             }
         }
@@ -140,19 +162,19 @@ namespace CoTubeAccountManager
         /// <param name="commentLink">
         ///     The comment link.
         /// </param>
-        private static void SubmitCommentId(string commentLink)
+        private void SubmitCommentId(string commentLink)
         {
-            if (string.IsNullOrWhiteSpace(PanelUsername))
+            if (string.IsNullOrWhiteSpace(this.PanelUsername))
             {
                 return;
             }
 
             if (!UpvoteManager.IsLoggedIn)
             {
-                UpvoteManager.Login(PanelUsername, PanelPassword);
+                UpvoteManager.Login(this.PanelUsername, this.PanelPassword);
             }
 
-            UpvoteManager.SubmitUpvoteRequest(commentLink, 15);
+            UpvoteManager.SubmitUpvoteRequest(commentLink, this.PanelUpvoteAmount);
         }
     }
 }

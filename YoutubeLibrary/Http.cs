@@ -11,7 +11,6 @@ namespace YoutubeLibrary
 {
     using System.Collections.Specialized;
     using System.Diagnostics;
-    using System.IO;
     using System.Net;
     using System.Text;
 
@@ -73,6 +72,37 @@ namespace YoutubeLibrary
         private string Useragent { get; } = UserAgent.GenerateUseragent();
 
         /// <summary>
+        ///     The read chunked response.
+        /// </summary>
+        /// <param name="response">
+        ///     The response.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="string" />.
+        /// </returns>
+        public static string ReadChunkedResponse(WebResponse response)
+        {
+            var sb = new StringBuilder();
+            var buf = new byte[8192];
+            var resStream = response.GetResponseStream();
+            int count;
+            do
+            {
+                Debug.Assert(resStream != null, "resStream != null");
+                count = resStream.Read(buf, 0, buf.Length);
+                if (count == 0)
+                {
+                    continue;
+                }
+
+                var tmpString = Encoding.ASCII.GetString(buf, 0, count);
+                sb.Append(tmpString);
+            }
+            while (count > 0);
+            return sb.ToString();
+        }
+
+        /// <summary>
         ///     Add header.
         /// </summary>
         /// <param name="name">
@@ -119,15 +149,7 @@ namespace YoutubeLibrary
 
             using (var response = (HttpWebResponse)this.request.GetResponse())
             {
-                using (var responseStream = response.GetResponseStream())
-                {
-                    Debug.Assert(responseStream != null, "responseStream != null");
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        var responseRead = reader.ReadToEnd();
-                        return responseRead;
-                    }
-                }
+                return ReadChunkedResponse(response);
             }
         }
 
@@ -168,7 +190,7 @@ namespace YoutubeLibrary
             this.request.CookieContainer = this.Cookies;
             this.request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
             this.request.ContentType = "application/x-www-form-urlencoded";
-            this.request.Headers.Add("Accept-Encoding", "gzip, deflate, br");
+            this.request.Headers.Add("Accept-Encoding", "gzip, deflate");
             this.request.Headers.Add("Accept-Language", "en-US,en;q=0.8,nl;q=0.6");
             this.request.Headers.Add("DNT", "1");
             foreach (string header in this.extraHeaders.Keys)
@@ -192,10 +214,10 @@ namespace YoutubeLibrary
         {
             if (!this.Proxy.HasProxy)
             {
-                return null;
+                return WebRequest.DefaultWebProxy;
             }
 
-            var webProxy = new WebProxy(this.Proxy.GetProxyFormated(), true);
+            var webProxy = new WebProxy(this.Proxy.ProxyFormated, true);
             if (!this.Proxy.HasCredentials)
             {
                 return webProxy;

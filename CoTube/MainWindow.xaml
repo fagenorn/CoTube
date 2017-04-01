@@ -4,10 +4,126 @@
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:account="clr-namespace:CoTubeAccountManager;assembly=CoTubeAccountManager"
+                      xmlns:usefullUtilitiesLibrary="clr-namespace:UsefullUtilitiesLibrary;assembly=UsefullUtilitiesLibrary"
                       mc:Ignorable="d"
                       GlowBrush="{DynamicResource  AccentColorBrush}"
-                      Title="CoTube" Height="350" Width="525">
+                      Title="CoTube" Height="500" Width="700" MinHeight="300" MinWidth="500"
+                      DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <controls:MetroWindow.WindowButtonCommands>
         <controls:WindowButtonCommands Template="{DynamicResource MahApps.Metro.Templates.WindowButtonCommands.Win10}" />
     </controls:MetroWindow.WindowButtonCommands>
+    <controls:MetroTabControl>
+        <TabItem Header="Overview">
+            <StackPanel>
+                <TextBlock Text="Account Status" FontSize="24" />
+                <Separator />
+                <Button Width="150" Click="StartAccountManagerClick" Margin="0, 10,0,0">
+                    <TextBlock Text="Start" />
+                </Button>
+                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBox Text="{Binding AccountManager.PanelUsername}"
+                             controls:TextBoxHelper.Watermark="Panel Username" Margin="0,0,5,0" />
+                    <TextBox Text="{Binding AccountManager.PanelPassword}"
+                             controls:TextBoxHelper.Watermark="Panel Password" />
+                </StackPanel>
+                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock FontSize="16" Text="Upvote Amount: " />
+                    <controls:NumericUpDown Value="{Binding AccountManager.PanelUpvoteAmount}" Width="100" Minimum="15"
+                                            Maximum="500" />
+                </StackPanel>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Accounts">
+            <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                      ItemsSource="{Binding Source={x:Static account:AccountManager.Accounts}}"
+                      ContextMenuOpening="GridContextMenuOpening">
+                <DataGrid.Style>
+                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                    <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                        <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Email}" CanUserSort="False" CanUserReorder="False"
+                                        CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                        Header="Email" IsReadOnly="True" Width="*" />
+                    <DataGridTextColumn Binding="{Binding Proxy.ProxyFormated}" CanUserSort="False"
+                                        CanUserReorder="False"
+                                        CanUserResize="False" ClipboardContentBinding="{x:Null}" Header="Proxy"
+                                        IsReadOnly="True" Width="*" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="New Account" usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="Always">
+                            <MenuItem Header="Single" Click="AddNewAccountClick" />
+                            <MenuItem Header="Import File" Click="ImportFileAccount">
+                                <MenuItem.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel>
+                                            <TextBlock FontWeight="Bold"
+                                                       Text="Import a file with format:" />
+                                            <TextBlock FontWeight="Bold"
+                                                       Text="Username:Password|Ip:Port|ProxyUser:ProxyPass" />
+
+                                        </StackPanel>
+                                    </ToolTip>
+                                </MenuItem.ToolTip>
+                            </MenuItem>
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </TabItem>
+        <TabItem Header="URLs">
+            <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                      ItemsSource="{Binding Source={x:Static account:AccountManager.Urls}}"
+                      ContextMenuOpening="GridContextMenuOpening">
+                <DataGrid.Style>
+                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                    <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                        <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding}" CanUserSort="False" CanUserReorder="False"
+                                        CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                        Header="URL" IsReadOnly="True" Width="*" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="New Url" usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="Always">
+                            <MenuItem Header="Single" Click="AddNewUrlClick" />
+                            <MenuItem Header="Import File" Click="ImportFileUrl" />
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </TabItem>
+        <TabItem Header="Comments">
+            <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                      ItemsSource="{Binding Source={x:Static account:AccountManager.Comments}}"
+                      ContextMenuOpening="GridContextMenuOpening">
+                <DataGrid.Style>
+                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                    <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                        <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding}" CanUserSort="False" CanUserReorder="False"
+                                        CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                        Header="Comment" IsReadOnly="True" Width="*" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="New Comment" usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="Always">
+                            <MenuItem Header="Single" Click="AddNewCommentClick" />
+                            <MenuItem Header="Import File" Click="ImportFileComment" />
+                        </MenuItem>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </TabItem>
+    </controls:MetroTabControl>
 </controls:MetroWindow>

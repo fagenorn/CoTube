@@ -25,11 +25,6 @@ namespace YoutubeLibrary
         private readonly Http http;
 
         /// <summary>
-        ///     The proxy.
-        /// </summary>
-        private readonly Proxy proxy = new Proxy();
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="YAccount" /> class.
         /// </summary>
         /// <param name="email">
@@ -42,7 +37,7 @@ namespace YoutubeLibrary
         {
             this.Email = email;
             this.Password = password;
-            this.http = new Http(this.proxy);
+            this.http = new Http(this.Proxy);
         }
 
         /// <summary>
@@ -54,6 +49,11 @@ namespace YoutubeLibrary
         ///     Gets the password.
         /// </summary>
         public string Password { get; }
+
+        /// <summary>
+        ///     Gets or sets the proxy.
+        /// </summary>
+        public Proxy Proxy { get; set; } = new Proxy();
 
         /// <summary>
         ///     Comment on a video.
@@ -123,6 +123,10 @@ namespace YoutubeLibrary
         public bool Login()
         {
             var emailResponse = this.http.SimpleYoutubeRequest(Constants.LoginUrl);
+            if (this.IsLoggedIn())
+            {
+                return true;
+            }
 
             var inputs = emailResponse.GetFormValuesFromId("gaia_loginform");
             inputs["Email"] = this.Email;
@@ -133,6 +137,7 @@ namespace YoutubeLibrary
             inputs = passwordResponse.GetFormValuesFromId("gaia_loginform");
             inputs.Add("Passwd", this.Password);
             this.http.SimpleYoutubeRequest(passwordResponse.GetActionFromFormId("gaia_loginform"), inputs);
+
             return true;
         }
     }

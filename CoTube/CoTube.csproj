@@ -100,5 +100,19 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Gram-MultiTool-2\UsefullUtilitiesLibrary\UsefullUtilitiesLibrary.csproj">
+      <Project>{2d967ede-0396-40d8-9c14-69a87e38e45a}</Project>
+      <Name>UsefullUtilitiesLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CoTubeAccountManager\CoTubeAccountManager.csproj">
+      <Project>{631165b1-f577-4896-980b-2a07a5583044}</Project>
+      <Name>CoTubeAccountManager</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\YoutubeLibrary\YoutubeLibrary.csproj">
+      <Project>{e987c437-9b1d-44f5-ade5-a6cf7b276ca6}</Project>
+      <Name>YoutubeLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

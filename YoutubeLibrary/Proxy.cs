@@ -9,12 +9,10 @@
 
 namespace YoutubeLibrary
 {
-    using System;
-
     /// <summary>
     ///     The proxy.
     /// </summary>
-    internal class Proxy
+    public class Proxy
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="Proxy" /> class.
@@ -76,6 +74,11 @@ namespace YoutubeLibrary
         public bool HasProxy { get; }
 
         /// <summary>
+        ///     Gets the proxy formatted.
+        /// </summary>
+        public string ProxyFormated => !this.HasProxy ? "N/A" : $"{this.Ip}:{this.Port}";
+
+        /// <summary>
         ///     Gets the IP.
         /// </summary>
         private string Ip { get; }
@@ -84,16 +87,5 @@ namespace YoutubeLibrary
         ///     Gets the port.
         /// </summary>
         private string Port { get; }
-
-        /// <summary>
-        ///     Get the proxy formatted.
-        /// </summary>
-        /// <returns>
-        ///     The <see cref="Uri" />.
-        /// </returns>
-        public Uri GetProxyFormated()
-        {
-            return new Uri($"{this.Ip}:{this.Port}");
-        }
     }
 }

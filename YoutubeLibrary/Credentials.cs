@@ -12,7 +12,7 @@ namespace YoutubeLibrary
     /// <summary>
     ///     The credentials.
     /// </summary>
-    internal class Credentials
+    public class Credentials
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="Credentials" /> class.
