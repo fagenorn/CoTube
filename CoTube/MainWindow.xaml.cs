@@ -19,6 +19,8 @@ namespace CoTube
 
     using CoTubeAccountManager;
 
+    using FluentScheduler;
+
     using MahApps.Metro.Controls.Dialogs;
 
     using UsefullUtilitiesLibrary;
@@ -38,13 +40,34 @@ namespace CoTube
         {
             this.InitializeComponent();
             BindingOperations.EnableCollectionSynchronization(AccountManager.Log, AccountManager.Lock);
+            JobManager.Initialize(new Registry());
+        }
 
+        /// <summary>
+        ///     The status.
+        /// </summary>
+        private enum Status
+        {
+            /// <summary>
+            ///     The start.
+            /// </summary>
+            Start,
+
+            /// <summary>
+            ///     The stop.
+            /// </summary>
+            Stop
         }
 
         /// <summary>
         ///     Gets or sets the account manager.
         /// </summary>
         public AccountManager AccountManager { get; set; } = new AccountManager();
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether account manager is busy.
+        /// </summary>
+        private bool IsBusy { get; set; }
 
         /// <summary>
         ///     Add a new account.
@@ -442,19 +465,24 @@ namespace CoTube
         }
 
         /// <summary>
-        ///     Start account manager button is clicked.
+        ///     Start account manager.
         /// </summary>
-        /// <param name="sender">
-        ///     The sender.
+        /// <param name="status">
+        ///     The status.
         /// </param>
-        /// <param name="e">
-        ///     The e.
-        /// </param>
-        private async void StartAccountManagerClick(object sender, RoutedEventArgs e)
+        /// <returns>
+        ///     The <see cref="Task" />.
+        /// </returns>
+        private async Task StartAccountManager(Status status)
         {
-            var textButton = (TextBlock)((Button)sender).Content;
-            if (textButton.Text == "Start")
+            if (status == Status.Start)
             {
+                if (this.IsBusy)
+                {
+                    AccountManager.AddNewLog($"Can't Start - Automatic Scheduler Is Running.");
+                    return;
+                }
+
                 if (AccountManager.Accounts.Count == 0)
                 {
                     // No Accounts
@@ -476,7 +504,7 @@ namespace CoTube
                     return;
                 }
 
-                textButton.Text = "Stop";
+                this.IsBusy = true;
                 AccountManager.CancellationTokenSource.Dispose();
                 AccountManager.CancellationTokenSource = new CancellationTokenSource();
                 try
@@ -484,17 +512,56 @@ namespace CoTube
                     await Task.Factory.StartNew(
                                                 this.AccountManager.StartCommentingProcess,
                                                 AccountManager.CancellationTokenSource.Token);
+                    if (!this.AccountManager.AutomaticRestarter)
+                    {
+                        return;
+                    }
+
+                    JobManager.AddJob(
+                                      async () => await this.StartAccountManager(Status.Start),
+                                      s =>
+                                          s.NonReentrant()
+                                           .ToRunOnceIn(this.AccountManager.AutomaticRestarterTimeout)
+                                           .Seconds());
+                    AccountManager.AddNewLog(
+                                             $"Automatic Scheduler - Next run in {this.AccountManager.AutomaticRestarterTimeout} minute(s)");
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
                 }
-
-                textButton.Text = "Start";
+                finally
+                {
+                    this.IsBusy = false;
+                }
             }
             else
             {
                 AccountManager.CancellationTokenSource.Cancel();
+            }
+        }
+
+        /// <summary>
+        ///     Start account manager button is clicked.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private async void StartAccountManagerClick(object sender, RoutedEventArgs e)
+        {
+            var textButton = (TextBlock)((Button)sender).Content;
+            if (textButton.Text == "Start")
+            {
+                textButton.Text = "Stop";
+                await this.StartAccountManager(Status.Start);
+                textButton.Text = "Start";
+            }
+            else
+            {
+                await this.StartAccountManager(Status.Stop);
             }
         }
     }

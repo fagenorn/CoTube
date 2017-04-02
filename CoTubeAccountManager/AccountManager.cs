@@ -57,6 +57,16 @@ namespace CoTubeAccountManager
         public static ObservableCollectionExt<string> Urls { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
+        ///     Gets or sets a value indicating whether automatic restart.
+        /// </summary>
+        public bool AutomaticRestarter { get; set; } = false;
+
+        /// <summary>
+        ///     Gets or sets the automatic restart timeout in minutes. Time before restarting process.
+        /// </summary>
+        public int AutomaticRestarterTimeout { get; set; } = 1;
+
+        /// <summary>
         ///     Gets or sets the max threads.
         /// </summary>
         public int MaxThreads { get; set; } = 5;
@@ -101,6 +111,22 @@ namespace CoTubeAccountManager
         public static void AddNewCommentRange(IEnumerable<string> comments)
         {
             Comments.AddRange(comments);
+        }
+
+        /// <summary>
+        ///     Add new log item.
+        /// </summary>
+        /// <param name="item">
+        ///     The item.
+        /// </param>
+        public static void AddNewLog(string item)
+        {
+            Log.Add(item);
+            const int MaxLogAmount = 10;
+            if (Log.Count > MaxLogAmount)
+            {
+                ListHelper.RemoveRange(Log, 0, Log.Count - 1 - MaxLogAmount);
+            }
         }
 
         /// <summary>
@@ -208,22 +234,6 @@ namespace CoTubeAccountManager
                                          CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
                                      }
                                  });
-        }
-
-        /// <summary>
-        ///     Add new log item.
-        /// </summary>
-        /// <param name="item">
-        ///     The item.
-        /// </param>
-        private static void AddNewLog(string item)
-        {
-            Log.Add(item);
-            const int MaxLogAmount = 10;
-            if (Log.Count > MaxLogAmount)
-            {
-                ListHelper.RemoveRange(Log, 0, Log.Count - 1 - MaxLogAmount);
-            }
         }
 
         /// <summary>
