@@ -82,6 +82,20 @@ namespace YoutubeLibrary
         }
 
         /// <summary>
+        /// The get comment parameter.
+        /// </summary>
+        /// <param name="commentResponse">
+        /// The comment response.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public static string GetCommentParam(this string commentResponse)
+        {
+            return RegexGetMatch("data-simplebox-params=\\\\\"(.*?)\\\\\"", commentResponse);
+        }
+
+        /// <summary>
         ///     Get video parameter.
         /// </summary>
         /// <param name="htmlDocument">

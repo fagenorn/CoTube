@@ -93,12 +93,14 @@ namespace YoutubeLibrary
                                { "session_token", sessionToken }
                            };
 
-            var commentId = this.http.SimpleYoutubeRequest(Constants.PostCommentUrl, body).GetCommentId();
+            var commentResponse = this.http.SimpleYoutubeRequest(Constants.PostCommentUrl, body);
             return new CommentResponse
                        {
                            Success = true,
-                           CommentId = commentId,
-                           CommentLink = $"https://www.youtube.com/watch?v={videoCode}&lc={commentId}"
+                           Parameter = commentResponse.GetCommentParam(),
+                           CommentId = commentResponse.GetCommentId(),
+                           CommentLink =
+                               $"https://www.youtube.com/watch?v={videoCode}&lc={commentResponse.GetCommentId()}"
                        };
         }
 
@@ -139,6 +141,57 @@ namespace YoutubeLibrary
             this.http.SimpleYoutubeRequest(passwordResponse.GetActionFromFormId("gaia_loginform"), inputs);
 
             return true;
+        }
+
+        /// <summary>
+        ///     Reply to a comment.
+        /// </summary>
+        /// <param name="videoUrl">
+        ///     The video url.
+        /// </param>
+        /// <param name="replyParam">
+        ///     The reply parameter.
+        /// </param>
+        /// <param name="comment">
+        ///     The comment.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="CommentResponse" />.
+        /// </returns>
+        public CommentResponse Reply(string videoUrl, string replyParam, string comment)
+        {
+            var videoCode = videoUrl.GetVideoCodeFromUrl();
+            var videoResp = this.http.SimpleYoutubeRequest(videoUrl);
+            var sessionToken = videoResp.GetSessionToken();
+            var commentToken = WebUtility.UrlEncode(videoResp.GetCommentToken());
+
+            var identityTokenHeader = videoResp.GetIdentityToken();
+            this.http.AddHeader("X-Youtube-Identity-Token", identityTokenHeader);
+
+            var watchResponse =
+                this.http.SimpleYoutubeRequest(
+                                               string.Format(Constants.VideoWatchUrl, videoCode, commentToken),
+                                               Method.Post,
+                                               $"session_token={sessionToken}");
+            watchResponse.GetBotguardCode();
+
+            var body = new NameValueCollection
+                           {
+                               { "content", comment },
+                               { "params", replyParam },
+                               { "bgr", watchResponse.GetBotguardCode() },
+                               { "session_token", sessionToken }
+                           };
+
+            var commentResponse = this.http.SimpleYoutubeRequest(Constants.ReplyUrl, body);
+            return new CommentResponse
+                       {
+                           Success = true,
+                           Parameter = commentResponse.GetCommentParam(),
+                           CommentId = commentResponse.GetCommentId(),
+                           CommentLink =
+                               $"https://www.youtube.com/watch?v={videoCode}&lc={commentResponse.GetCommentId()}"
+                       };
         }
     }
 }

@@ -28,6 +28,11 @@ namespace YoutubeLibrary
         public static string PostCommentUrl => "https://www.youtube.com/comment_service_ajax?action_create_comment=1";
 
         /// <summary>
+        ///     The reply  url.
+        /// </summary>
+        public static string ReplyUrl => "https://www.youtube.com/comment_service_ajax?action_create_comment_reply=1";
+
+        /// <summary>
         ///     The video watch url.
         /// </summary>
         public static string VideoWatchUrl

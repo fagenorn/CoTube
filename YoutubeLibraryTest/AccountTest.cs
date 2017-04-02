@@ -51,6 +51,25 @@ namespace YoutubeLibraryTest
         }
 
         /// <summary>
+        /// Reply to comment.
+        /// </summary>
+        [TestMethod]
+        public void ReplyToComment()
+        {
+            const string Email = "donaldducktrumpmaker@gmail.com";
+            const string Password = "celementoni";
+            var account = new YAccount(Email, Password);
+            const string VideoUrl = "https://www.youtube.com/watch?v=RAF7ufz47t8";
+            account.Login();
+            var response = account.Comment(VideoUrl, "Meg is pretty cool");
+            Assert.IsTrue(response.Success);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));
+            response = account.Reply(VideoUrl, response.Parameter, ":P");
+            Assert.IsTrue(response.Success);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));
+        }
+
+        /// <summary>
         ///     Set up various account details.
         /// </summary>
         [TestInitialize]
