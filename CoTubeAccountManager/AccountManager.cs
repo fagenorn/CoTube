@@ -42,6 +42,11 @@ namespace CoTubeAccountManager
         public static ObservableCollectionExt<string> Comments { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
+        /// Gets or sets the delay between each comment.
+        /// </summary>
+        public static int DelayBetweenEachComment { get; set; } = 10000;
+
+        /// <summary>
         ///     The lock.
         /// </summary>
         public static object Lock => new object();
@@ -85,11 +90,6 @@ namespace CoTubeAccountManager
         ///     Gets or sets the panel username.
         /// </summary>
         public string PanelUsername { get; set; }
-
-        /// <summary>
-        ///     The delay between each comment in milliseconds.
-        /// </summary>
-        private static int DelayBetweenEachComment => 6000;
 
         /// <summary>
         ///     Add new comment.

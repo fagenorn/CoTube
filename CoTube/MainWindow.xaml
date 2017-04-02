@@ -37,6 +37,11 @@
                     <controls:NumericUpDown Value="{Binding AccountManager.MaxThreads}" Width="100" Minimum="1"
                                             Maximum="35" />
                 </StackPanel>
+                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock FontSize="16" Text="Delay Between Each Comment (milliseconds): " />
+                    <controls:NumericUpDown Value="{Binding AccountManager.DelayBetweenEachComment}" Width="100" Minimum="500"
+                                            Maximum="60000" />
+                </StackPanel>
                 <GroupBox Header="Automatic Restarter" Margin="10">
                     <StackPanel>
                         <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
