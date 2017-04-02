@@ -304,7 +304,7 @@ namespace CoTube
         /// </summary>
         private void DeleteReplies()
         {
-            var selectedItemsList = this.CommentsGrid.SelectedItems.Cast<string>().ToList();
+            var selectedItemsList = this.RepliesGrid.SelectedItems.Cast<string>().ToList();
             if (selectedItemsList.Count == 0)
             {
                 return;
