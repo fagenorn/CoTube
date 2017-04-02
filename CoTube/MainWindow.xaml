@@ -46,9 +46,9 @@
                         </Style>
                     </DataGrid.Style>
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding}" CanUserSort="False" CanUserReorder="False"
+                        <DataGridTextColumn Binding="{Binding}" CanUserSort="True" CanUserReorder="False"
                                             CanUserResize="False" ClipboardContentBinding="{x:Null}"
-                                            Header="URL" IsReadOnly="True" Width="*" />
+                                            Header="Log" IsReadOnly="True" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </StackPanel>

@@ -9,6 +9,7 @@
 
 namespace CoTubeAccountManager
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -157,9 +158,17 @@ namespace CoTubeAccountManager
                                          AddNewLog($"Logging in - {account.Email}");
                                      }
 
-                                     account.Login();
-                                     if (!account.IsLoggedIn())
+                                     try
                                      {
+                                         account.Login();
+                                         if (!account.IsLoggedIn())
+                                         {
+                                             return;
+                                         }
+                                     }
+                                     catch (Exception)
+                                     {
+                                         AddNewLog($"Failed to login - {account.Email}");
                                          return;
                                      }
 
@@ -177,10 +186,18 @@ namespace CoTubeAccountManager
                                              AddNewLog($"Commenting on {urlToComment} - {account.Email}");
                                          }
 
-                                         var commentResponse = account.Comment(urlToComment, comment.SpinIt());
-                                         if (commentResponse.Success)
+                                         try
                                          {
-                                             this.SubmitCommentId(commentResponse.CommentLink);
+                                             var commentResponse = account.Comment(urlToComment, comment.SpinIt());
+                                             if (commentResponse.Success)
+                                             {
+                                                 this.SubmitCommentId(commentResponse.CommentLink);
+                                             }
+                                         }
+                                         catch (Exception)
+                                         {
+                                             AddNewLog($"Failed to Comment - {account.Email}");
+                                             return;
                                          }
 
                                          lock (Lock)
