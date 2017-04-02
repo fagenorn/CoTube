@@ -195,6 +195,26 @@ namespace CoTube
         }
 
         /// <summary>
+        ///     Add new reply button is  clicked.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private async void AddNewReplyClick(object sender, RoutedEventArgs e)
+        {
+            var reply = await this.ShowInputAsync("Add Reply", "Enter the reply. Spintax supported.");
+            if (string.IsNullOrWhiteSpace(reply))
+            {
+                return;
+            }
+
+            AccountManager.AddNewReply(reply);
+        }
+
+        /// <summary>
         ///     Add new url button is clicked.
         /// </summary>
         /// <param name="sender">
@@ -277,6 +297,34 @@ namespace CoTube
         private void DeleteCommentsClick(object sender, RoutedEventArgs e)
         {
             this.DeleteComments();
+        }
+
+        /// <summary>
+        ///     Delete replies.
+        /// </summary>
+        private void DeleteReplies()
+        {
+            var selectedItemsList = this.CommentsGrid.SelectedItems.Cast<string>().ToList();
+            if (selectedItemsList.Count == 0)
+            {
+                return;
+            }
+
+            AccountManager.Replies.RemoveAll(x => selectedItemsList.Any(y => y.ToLower().Trim() == x.ToLower().Trim()));
+        }
+
+        /// <summary>
+        ///     Delete replies button is click.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void DeleteRepliesClick(object sender, RoutedEventArgs e)
+        {
+            this.DeleteReplies();
         }
 
         /// <summary>
@@ -428,6 +476,35 @@ namespace CoTube
                 }
 
                 AccountManager.AddNewComment(line);
+            }
+        }
+
+        /// <summary>
+        ///     Import file reply.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void ImportFileReply(object sender, RoutedEventArgs e)
+        {
+            var path = FileDialogHelper.OpenTextFile();
+            if (path == null)
+            {
+                return;
+            }
+
+            var list = FileDialogHelper.ReadPerLine(path);
+            foreach (var line in list)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                AccountManager.AddNewReply(line);
             }
         }
 

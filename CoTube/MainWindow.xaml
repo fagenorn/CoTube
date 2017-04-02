@@ -171,5 +171,33 @@
                 </DataGrid.ContextMenu>
             </DataGrid>
         </TabItem>
+        <TabItem Header="Replies">
+            <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                      ItemsSource="{Binding Source={x:Static account:AccountManager.Replies}}"
+                      ContextMenuOpening="GridContextMenuOpening" x:Name="RepliesGrid">
+                <DataGrid.Style>
+                    <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                    <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                        <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                    </Style>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding}" CanUserSort="False" CanUserReorder="False"
+                                        CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                        Header="Reply" IsReadOnly="True" Width="*" />
+                </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="New Reply" usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="Always">
+                            <MenuItem Header="Single" Click="AddNewReplyClick" />
+                            <MenuItem Header="Import File" Click="ImportFileReply" />
+                        </MenuItem>
+                        <Separator Margin="0, -6, 14, -5" />
+                        <MenuItem Header="Delete Reply" Click="DeleteRepliesClick"
+                                  usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="OneOrMore" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
+        </TabItem>
     </controls:MetroTabControl>
 </controls:MetroWindow>

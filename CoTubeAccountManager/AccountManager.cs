@@ -42,7 +42,7 @@ namespace CoTubeAccountManager
         public static ObservableCollectionExt<string> Comments { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
-        /// Gets or sets the delay between each comment.
+        ///     Gets or sets the delay between each comment.
         /// </summary>
         public static int DelayBetweenEachComment { get; set; } = 10000;
 
@@ -55,6 +55,11 @@ namespace CoTubeAccountManager
         ///     Gets the log.
         /// </summary>
         public static ObservableCollectionExt<string> Log { get; } = new ObservableCollectionExt<string>();
+
+        /// <summary>
+        ///     Gets the replies.
+        /// </summary>
+        public static ObservableCollectionExt<string> Replies { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
         ///     Gets the URLs to comment on.
@@ -130,6 +135,17 @@ namespace CoTubeAccountManager
         }
 
         /// <summary>
+        ///     Add new reply.
+        /// </summary>
+        /// <param name="reply">
+        ///     The reply.
+        /// </param>
+        public static void AddNewReply(string reply)
+        {
+            Replies.Add(reply);
+        }
+
+        /// <summary>
         ///     Add a YouTube URL to comment on.
         /// </summary>
         /// <param name="url">
@@ -173,36 +189,45 @@ namespace CoTubeAccountManager
                                   CancellationToken = CancellationTokenSource.Token,
                                   MaxDegreeOfParallelism = this.MaxThreads
                               };
+            var options2 = new ParallelOptions { MaxDegreeOfParallelism = this.MaxThreads };
+            Parallel.ForEach(
+                             Accounts,
+                             options2,
+                             account =>
+                                 {
+                                     try
+                                     {
+                                         lock (Lock)
+                                         {
+                                             AddNewLog($"Logging in - {account.Email}");
+                                         }
+
+                                         account.Login();
+                                     }
+                                     catch (Exception)
+                                     {
+                                         AddNewLog($"Failed to login - {account.Email}");
+                                     }
+                                 });
+
             Parallel.ForEach(
                              Accounts,
                              options,
                              account =>
                                  {
                                      CancellationTokenSource.Token.ThrowIfCancellationRequested();
-                                     lock (Lock)
-                                     {
-                                         AddNewLog($"Logging in - {account.Email}");
-                                     }
 
-                                     try
-                                     {
-                                         account.Login();
-                                         if (!account.IsLoggedIn())
-                                         {
-                                             return;
-                                         }
-                                     }
-                                     catch (Exception)
-                                     {
-                                         AddNewLog($"Failed to login - {account.Email}");
-                                         return;
-                                     }
-
+                                     // Start Commenting on 3 Random Videos
                                      for (var i = 0; i < 3; i++)
                                      {
                                          if (toCommentList.Count == 0)
                                          {
                                              continue;
+                                         }
+
+                                         if (!account.IsLoggedIn())
+                                         {
+                                             return;
                                          }
 
                                          var urlToComment = toCommentList.RandomItem();
@@ -218,6 +243,17 @@ namespace CoTubeAccountManager
                                              if (commentResponse.Success)
                                              {
                                                  this.SubmitCommentId(commentResponse.CommentLink);
+                                             }
+
+                                             // Reply 5 times to comment with random accounts
+                                             for (var j = 0; j < 5; j++)
+                                             {
+                                                 var replyAccount = Accounts.RandomItem();
+                                                 var reply = Replies.RandomItem();
+                                                 replyAccount.Reply(
+                                                                    urlToComment,
+                                                                    commentResponse.Parameter,
+                                                                    reply.SpinIt());
                                              }
                                          }
                                          catch (Exception)
