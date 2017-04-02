@@ -32,12 +32,31 @@
                     <controls:NumericUpDown Value="{Binding AccountManager.PanelUpvoteAmount}" Width="100" Minimum="15"
                                             Maximum="500" />
                 </StackPanel>
+                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock FontSize="16" Text="Max Threads: " />
+                    <controls:NumericUpDown Value="{Binding AccountManager.MaxThreads}" Width="100" Minimum="1"
+                                            Maximum="35" />
+                </StackPanel>
+                <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                          ItemsSource="{Binding Source={x:Static account:AccountManager.Log}}" MaxHeight="400">
+                    <DataGrid.Style>
+                        <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                        <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                            <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                        </Style>
+                    </DataGrid.Style>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding}" CanUserSort="False" CanUserReorder="False"
+                                            CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                            Header="URL" IsReadOnly="True" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </StackPanel>
         </TabItem>
         <TabItem Header="Accounts">
             <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
                       ItemsSource="{Binding Source={x:Static account:AccountManager.Accounts}}"
-                      ContextMenuOpening="GridContextMenuOpening">
+                      ContextMenuOpening="GridContextMenuOpening" x:Name="AccountsGrid">
                 <DataGrid.Style>
                     <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
                     <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
@@ -71,6 +90,9 @@
                                 </MenuItem.ToolTip>
                             </MenuItem>
                         </MenuItem>
+                        <Separator Margin="0, -6, 14, -5" />
+                        <MenuItem Header="Delete Account(s)" Click="DeleteAccountsClick"
+                                  usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="OneOrMore" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
@@ -78,7 +100,7 @@
         <TabItem Header="URLs">
             <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
                       ItemsSource="{Binding Source={x:Static account:AccountManager.Urls}}"
-                      ContextMenuOpening="GridContextMenuOpening">
+                      ContextMenuOpening="GridContextMenuOpening" x:Name="UrlsGrid">
                 <DataGrid.Style>
                     <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
                     <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
@@ -96,6 +118,9 @@
                             <MenuItem Header="Single" Click="AddNewUrlClick" />
                             <MenuItem Header="Import File" Click="ImportFileUrl" />
                         </MenuItem>
+                        <Separator Margin="0, -6, 14, -5" />
+                        <MenuItem Header="Delete Url(s)" Click="DeleteUrlsClick"
+                                  usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="OneOrMore" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>
@@ -103,7 +128,7 @@
         <TabItem Header="Comments">
             <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
                       ItemsSource="{Binding Source={x:Static account:AccountManager.Comments}}"
-                      ContextMenuOpening="GridContextMenuOpening">
+                      ContextMenuOpening="GridContextMenuOpening" x:Name="CommentsGrid">
                 <DataGrid.Style>
                     <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
                     <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
@@ -121,6 +146,9 @@
                             <MenuItem Header="Single" Click="AddNewCommentClick" />
                             <MenuItem Header="Import File" Click="ImportFileComment" />
                         </MenuItem>
+                        <Separator Margin="0, -6, 14, -5" />
+                        <MenuItem Header="Delete Comment(s)" Click="DeleteCommentsClick"
+                                  usefullUtilitiesLibrary:DataGridHelper.MenuWhenEnable="OneOrMore" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
             </DataGrid>

@@ -10,9 +10,9 @@
 namespace CoTubeAccountManager
 {
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using UsefullUtilitiesLibrary;
     using UsefullUtilitiesLibrary.CustomList;
@@ -27,8 +27,8 @@ namespace CoTubeAccountManager
         /// <summary>
         ///     Gets the accounts.
         /// </summary>
-        public static ObservableCollection<YAccount> Accounts { get; } =
-            new ObservableCollection<YAccount>(new List<YAccount>());
+        public static ObservableCollectionExt<YAccount> Accounts { get; } =
+            new ObservableCollectionExt<YAccount>(new List<YAccount>());
 
         /// <summary>
         ///     Gets or sets the cancellation token source.
@@ -41,9 +41,24 @@ namespace CoTubeAccountManager
         public static ObservableCollectionExt<string> Comments { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
+        ///     The lock.
+        /// </summary>
+        public static object Lock => new object();
+
+        /// <summary>
+        ///     Gets the log.
+        /// </summary>
+        public static ObservableCollectionExt<string> Log { get; } = new ObservableCollectionExt<string>();
+
+        /// <summary>
         ///     Gets the URLs to comment on.
         /// </summary>
         public static ObservableCollectionExt<string> Urls { get; } = new ObservableCollectionExt<string>();
+
+        /// <summary>
+        ///     Gets or sets the max threads.
+        /// </summary>
+        public int MaxThreads { get; set; } = 5;
 
         /// <summary>
         ///     Gets or sets the panel password.
@@ -125,34 +140,72 @@ namespace CoTubeAccountManager
         /// </summary>
         public void StartCommentingProcess()
         {
-            var toCommentList = Urls.ToList();
-            foreach (var account in Accounts)
+            var toCommentList = new List<string>(Urls.ToList());
+            var options = new ParallelOptions
+                              {
+                                  CancellationToken = CancellationTokenSource.Token,
+                                  MaxDegreeOfParallelism = this.MaxThreads
+                              };
+            Parallel.ForEach(
+                             Accounts,
+                             options,
+                             account =>
+                                 {
+                                     CancellationTokenSource.Token.ThrowIfCancellationRequested();
+                                     lock (Lock)
+                                     {
+                                         AddNewLog($"Logging in - {account.Email}");
+                                     }
+
+                                     account.Login();
+                                     if (!account.IsLoggedIn())
+                                     {
+                                         return;
+                                     }
+
+                                     for (var i = 0; i < 3; i++)
+                                     {
+                                         if (toCommentList.Count == 0)
+                                         {
+                                             continue;
+                                         }
+
+                                         var urlToComment = toCommentList.RandomItem();
+                                         var comment = Comments.RandomItem();
+                                         lock (Lock)
+                                         {
+                                             AddNewLog($"Commenting on {urlToComment} - {account.Email}");
+                                         }
+
+                                         var commentResponse = account.Comment(urlToComment, comment.SpinIt());
+                                         if (commentResponse.Success)
+                                         {
+                                             this.SubmitCommentId(commentResponse.CommentLink);
+                                         }
+
+                                         lock (Lock)
+                                         {
+                                             toCommentList.Remove(urlToComment);
+                                         }
+
+                                         CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
+                                     }
+                                 });
+        }
+
+        /// <summary>
+        ///     Add new log item.
+        /// </summary>
+        /// <param name="item">
+        ///     The item.
+        /// </param>
+        private static void AddNewLog(string item)
+        {
+            Log.Add(item);
+            const int MaxLogAmount = 10;
+            if (Log.Count > MaxLogAmount)
             {
-                CancellationTokenSource.Token.ThrowIfCancellationRequested();
-                account.Login();
-                if (!account.IsLoggedIn())
-                {
-                    continue;
-                }
-
-                for (var i = 0; i < 3; i++)
-                {
-                    if (toCommentList.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    var urlToComment = toCommentList.RandomItem();
-                    var comment = Comments.RandomItem();
-                    var commentResponse = account.Comment(urlToComment, comment.SpinIt());
-                    if (commentResponse.Success)
-                    {
-                        this.SubmitCommentId(commentResponse.CommentLink);
-                    }
-
-                    toCommentList.Remove(urlToComment);
-                    CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
-                }
+                ListHelper.RemoveRange(Log, 0, Log.Count - 1 - MaxLogAmount);
             }
         }
 

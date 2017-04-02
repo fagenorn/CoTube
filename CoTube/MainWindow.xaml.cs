@@ -10,16 +10,19 @@
 namespace CoTube
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
+    using System.Windows.Data;
 
     using CoTubeAccountManager;
 
     using MahApps.Metro.Controls.Dialogs;
 
     using UsefullUtilitiesLibrary;
+    using UsefullUtilitiesLibrary.FileManipulation;
 
     using YoutubeLibrary;
 
@@ -34,6 +37,8 @@ namespace CoTube
         public MainWindow()
         {
             this.InitializeComponent();
+            BindingOperations.EnableCollectionSynchronization(AccountManager.Log, AccountManager.Lock);
+
         }
 
         /// <summary>
@@ -191,6 +196,95 @@ namespace CoTube
         }
 
         /// <summary>
+        ///     Deletes accounts.
+        /// </summary>
+        private void DeleteAccounts()
+        {
+            var selectedItemsList = this.AccountsGrid.SelectedItems.Cast<YAccount>().ToList();
+            if (selectedItemsList.Count == 0)
+            {
+                return;
+            }
+
+            AccountManager.Accounts.RemoveAll(
+                                              x =>
+                                                  selectedItemsList.Any(
+                                                                        y =>
+                                                                            y.Email.ToLower().Trim()
+                                                                            == x.Email.ToLower().Trim()));
+        }
+
+        /// <summary>
+        ///     The delete accounts click.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void DeleteAccountsClick(object sender, RoutedEventArgs e)
+        {
+            this.DeleteAccounts();
+        }
+
+        /// <summary>
+        ///     Delete comments.
+        /// </summary>
+        private void DeleteComments()
+        {
+            var selectedItemsList = this.CommentsGrid.SelectedItems.Cast<string>().ToList();
+            if (selectedItemsList.Count == 0)
+            {
+                return;
+            }
+
+            AccountManager.Comments.RemoveAll(x => selectedItemsList.Any(y => y.ToLower().Trim() == x.ToLower().Trim()));
+        }
+
+        /// <summary>
+        ///     Delete comments click.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void DeleteCommentsClick(object sender, RoutedEventArgs e)
+        {
+            this.DeleteComments();
+        }
+
+        /// <summary>
+        ///     Delete URLs.
+        /// </summary>
+        private void DeleteUrls()
+        {
+            var selectedItemsList = this.UrlsGrid.SelectedItems.Cast<string>().ToList();
+            if (selectedItemsList.Count == 0)
+            {
+                return;
+            }
+
+            AccountManager.Urls.RemoveAll(x => selectedItemsList.Any(y => y.ToLower().Trim() == x.ToLower().Trim()));
+        }
+
+        /// <summary>
+        ///     Delete URLs click.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
+        private void DeleteUrlsClick(object sender, RoutedEventArgs e)
+        {
+            this.DeleteUrls();
+        }
+
+        /// <summary>
         ///     Context menu opening.
         /// </summary>
         /// <param name="sender">
@@ -241,19 +335,110 @@ namespace CoTube
             }
         }
 
+        /// <summary>
+        ///     Import an account file .
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
         private void ImportFileAccount(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var path = FileDialogHelper.OpenTextFile();
+            if (path == null)
+            {
+                return;
+            }
+
+            var list = FileDialogHelper.ReadPerLine(path);
+            var parsedList = FileDialogHelper.ParseUserFile(list);
+            foreach (var accountProxy in parsedList)
+            {
+                Proxy tempProxy = null;
+                if (accountProxy.ProxyPass != null)
+                {
+                    tempProxy = new Proxy(accountProxy.Ip, accountProxy.Port);
+                }
+                else if (accountProxy.Ip != null)
+                {
+                    tempProxy = new Proxy(
+                                          accountProxy.Ip,
+                                          accountProxy.Port,
+                                          new Credentials(accountProxy.ProxyUser, accountProxy.ProxyPass));
+                }
+
+                var account = new YAccount(accountProxy.Username, accountProxy.Password);
+                if (tempProxy != null)
+                {
+                    account.Proxy = tempProxy;
+                }
+
+                this.AddNewAccount(account);
+            }
         }
 
+        /// <summary>
+        ///     Import a comment file.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
         private void ImportFileComment(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var path = FileDialogHelper.OpenTextFile();
+            if (path == null)
+            {
+                return;
+            }
+
+            var list = FileDialogHelper.ReadPerLine(path);
+            foreach (var line in list)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
+                AccountManager.AddNewComment(line);
+            }
         }
 
+        /// <summary>
+        ///     Import a url file .
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
         private void ImportFileUrl(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            var path = FileDialogHelper.OpenTextFile();
+            if (path == null)
+            {
+                return;
+            }
+
+            var list = FileDialogHelper.ReadPerLine(path);
+            foreach (var url in list)
+            {
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    continue;
+                }
+
+                var urlFormated = url.ConvertValidHttpsUrl();
+                if (urlFormated.IsValidUriString())
+                {
+                    AccountManager.AddYoutubeUrl(urlFormated);
+                }
+            }
         }
 
         /// <summary>
