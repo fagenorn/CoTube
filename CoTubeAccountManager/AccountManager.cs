@@ -28,8 +28,7 @@ namespace CoTubeAccountManager
         /// <summary>
         ///     Gets the accounts.
         /// </summary>
-        public static ObservableCollectionExt<YAccount> Accounts { get; } =
-            new ObservableCollectionExt<YAccount>(new List<YAccount>());
+        public static AsyncObservableCollection<YAccount> Accounts { get; } = new AsyncObservableCollection<YAccount>();
 
         /// <summary>
         ///     Gets or sets the amount of replies to post per comment.
@@ -217,11 +216,25 @@ namespace CoTubeAccountManager
                                              AddNewLog($"Logging in - {account.Email}");
                                          }
 
-                                         account.Login();
+                                         var response = account.Login();
+                                         if (!response.ChallengeRequired)
+                                         {
+                                             return;
+                                         }
+
+                                         Accounts.RemoveAll(x => x.Email == account.Email);
+
+                                         lock (Lock)
+                                         {
+                                             AddNewLog($"Checkpoint required, deleting account - {account.Email}");
+                                         }
                                      }
                                      catch (Exception)
                                      {
-                                         AddNewLog($"Failed to login - {account.Email}");
+                                         lock (Lock)
+                                         {
+                                             AddNewLog($"Failed to login - {account.Email}");
+                                         }
                                      }
                                  });
 
@@ -242,6 +255,12 @@ namespace CoTubeAccountManager
 
                                          if (!account.IsLoggedIn())
                                          {
+                                             lock (Lock)
+                                             {
+                                                 AddNewLog($"Failed to login, deleting account - {account.Email}");
+                                             }
+
+                                             Accounts.RemoveAll(x => x.Email == account.Email);
                                              return;
                                          }
 

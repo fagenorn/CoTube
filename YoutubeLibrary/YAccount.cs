@@ -122,12 +122,12 @@ namespace YoutubeLibrary
         /// <returns>
         ///     The <see cref="bool" />.
         /// </returns>
-        public bool Login()
+        public LoginResponse Login()
         {
             var emailResponse = this.http.SimpleYoutubeRequest(Constants.LoginUrl);
             if (this.IsLoggedIn())
             {
-                return true;
+                return new LoginResponse { Success = true, ChallengeRequired = false };
             }
 
             var inputs = emailResponse.GetFormValuesFromId("gaia_loginform");
@@ -138,9 +138,9 @@ namespace YoutubeLibrary
 
             inputs = passwordResponse.GetFormValuesFromId("gaia_loginform");
             inputs.Add("Passwd", this.Password);
-            this.http.SimpleYoutubeRequest(passwordResponse.GetActionFromFormId("gaia_loginform"), inputs);
-
-            return true;
+            var loginUrl = passwordResponse.GetActionFromFormId("gaia_loginform");
+            var loginResponse = this.http.SimpleYoutubeRequest(loginUrl, inputs);
+            return loginResponse.Contains(Constants.ChallengeKeyword) ? new LoginResponse { Success = false, ChallengeRequired = true } : new LoginResponse { Success = true, ChallengeRequired = false };
         }
 
         /// <summary>

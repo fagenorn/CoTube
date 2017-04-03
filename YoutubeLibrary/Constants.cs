@@ -15,6 +15,12 @@ namespace YoutubeLibrary
     internal static class Constants
     {
         /// <summary>
+        ///     The challenge keyword to check if an account is banned.
+        /// </summary>
+        public static string ChallengeKeyword => "To sign in to your Google Account, choose a task from the list below."
+        ;
+
+        /// <summary>
         ///     The login URL.
         /// </summary>
         public static string LoginUrl
