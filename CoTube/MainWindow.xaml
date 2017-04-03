@@ -15,84 +15,87 @@
     </controls:MetroWindow.WindowButtonCommands>
     <controls:MetroTabControl>
         <TabItem Header="Overview">
-            <StackPanel>
-                <TextBlock Text="Account Status" FontSize="24" />
-                <Separator />
-                <Button Width="150" Click="StartAccountManagerClick" Margin="0, 10,0,0">
-                    <TextBlock Text="Start" />
-                </Button>
-                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBox Text="{Binding AccountManager.PanelUsername}"
-                             controls:TextBoxHelper.Watermark="Panel Username" Margin="0,0,5,0" />
-                    <TextBox Text="{Binding AccountManager.PanelPassword}"
-                             controls:TextBoxHelper.Watermark="Panel Password" />
-                </StackPanel>
-                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock FontSize="16" Text="Upvote Amount: " />
-                    <controls:NumericUpDown Value="{Binding AccountManager.PanelUpvoteAmount}" Width="100" Minimum="15"
-                                            Maximum="500" />
-                </StackPanel>
-                <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <TextBlock FontSize="16" Text="Max Threads: " />
-                    <controls:NumericUpDown Value="{Binding AccountManager.MaxThreads}" Width="100" Minimum="1"
-                                            Maximum="35" />
-                </StackPanel>
-                <GroupBox Header="Delays" Margin="10">
-                    <StackPanel>
-                        <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontSize="16" Text="Delay Between Each Comment (milliseconds): " />
-                            <controls:NumericUpDown Value="{Binding AccountManager.DelayBetweenEachComment}"
-                                                    Width="100" Minimum="500"
-                                                    Maximum="60000" />
-                        </StackPanel>
-                        <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontSize="16" Text="Delay Between Each Reply (milliseconds): " />
-                            <controls:NumericUpDown Value="{Binding AccountManager.DelayBetweenEachReply}"
-                                                    Width="100" Minimum="500"
-                                                    Maximum="60000" />
-                        </StackPanel>
-                        <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontSize="16" Text="Delay Before Start Reply Process (milliseconds): " />
-                            <controls:NumericUpDown Value="{Binding AccountManager.DelayBeforeStartReply}"
-                                                    Width="100" Minimum="500"
-                                                    Maximum="60000" />
-                        </StackPanel>
-                        <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontSize="16" Text="Reply Amount: " />
-                            <controls:NumericUpDown Value="{Binding AccountManager.AmountOfReplies}"
-                                                    Width="100" Minimum="0"
-                                                    Maximum="10" />
-                        </StackPanel>
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="Account Status" FontSize="24" />
+                    <Separator />
+                    <Button Width="150" Click="StartAccountManagerClick" Margin="0, 10,0,0">
+                        <TextBlock Text="Start" />
+                    </Button>
+                    <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBox Text="{Binding AccountManager.PanelUsername}"
+                                 controls:TextBoxHelper.Watermark="Panel Username" Margin="0,0,5,0" />
+                        <TextBox Text="{Binding AccountManager.PanelPassword}"
+                                 controls:TextBoxHelper.Watermark="Panel Password" />
                     </StackPanel>
-                </GroupBox>
-                <GroupBox Header="Automatic Restarter" Margin="10">
-                    <StackPanel>
-                        <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock FontSize="14" Text="Start After X minutes: " />
-                            <controls:NumericUpDown Value="{Binding AccountManager.AutomaticRestarterTimeout}"
-                                                    Width="100"
-                                                    Minimum="1"
-                                                    Maximum="60" />
-                        </StackPanel>
-                        <controls:ToggleSwitch HorizontalAlignment="Center"
-                                               IsChecked="{Binding AccountManager.AutomaticRestarter}" />
+                    <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock FontSize="16" Text="Upvote Amount: " />
+                        <controls:NumericUpDown Value="{Binding AccountManager.PanelUpvoteAmount}" Width="100"
+                                                Minimum="15"
+                                                Maximum="500" />
                     </StackPanel>
-                </GroupBox>
-                <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
-                          ItemsSource="{Binding Source={x:Static account:AccountManager.Log}}" MaxHeight="300">
-                    <DataGrid.Style>
-                        <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
-                        <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
-                            <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
-                        </Style>
-                    </DataGrid.Style>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding}" CanUserSort="True" CanUserReorder="False"
-                                            CanUserResize="False" ClipboardContentBinding="{x:Null}"
-                                            Header="Log" IsReadOnly="True" Width="*" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </StackPanel>
+                    <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock FontSize="16" Text="Max Threads: " />
+                        <controls:NumericUpDown Value="{Binding AccountManager.MaxThreads}" Width="100" Minimum="1"
+                                                Maximum="35" />
+                    </StackPanel>
+                    <GroupBox Header="Delays" Margin="10">
+                        <StackPanel>
+                            <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock FontSize="16" Text="Delay Between Each Comment (milliseconds): " />
+                                <controls:NumericUpDown Value="{Binding AccountManager.DelayBetweenEachComment}"
+                                                        Width="100" Minimum="500"
+                                                        Maximum="60000" />
+                            </StackPanel>
+                            <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock FontSize="16" Text="Delay Between Each Reply (milliseconds): " />
+                                <controls:NumericUpDown Value="{Binding AccountManager.DelayBetweenEachReply}"
+                                                        Width="100" Minimum="500"
+                                                        Maximum="60000" />
+                            </StackPanel>
+                            <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock FontSize="16" Text="Delay Before Start Reply Process (milliseconds): " />
+                                <controls:NumericUpDown Value="{Binding AccountManager.DelayBeforeStartReply}"
+                                                        Width="100" Minimum="500"
+                                                        Maximum="60000" />
+                            </StackPanel>
+                            <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock FontSize="16" Text="Reply Amount: " />
+                                <controls:NumericUpDown Value="{Binding AccountManager.AmountOfReplies}"
+                                                        Width="100" Minimum="0"
+                                                        Maximum="10" />
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Automatic Restarter" Margin="10">
+                        <StackPanel>
+                            <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock FontSize="14" Text="Start After X minutes: " />
+                                <controls:NumericUpDown Value="{Binding AccountManager.AutomaticRestarterTimeout}"
+                                                        Width="100"
+                                                        Minimum="1"
+                                                        Maximum="60" />
+                            </StackPanel>
+                            <controls:ToggleSwitch HorizontalAlignment="Center"
+                                                   IsChecked="{Binding AccountManager.AutomaticRestarter}" />
+                        </StackPanel>
+                    </GroupBox>
+                    <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
+                              ItemsSource="{Binding Source={x:Static account:AccountManager.Log}}" MaxHeight="300">
+                        <DataGrid.Style>
+                            <!-- ReSharper disable once Xaml.StaticResourceNotResolved -->
+                            <Style BasedOn="{StaticResource MetroDataGrid}" TargetType="{x:Type DataGrid}">
+                                <Setter Property="AlternatingRowBackground" Value="{DynamicResource GrayBrush10}" />
+                            </Style>
+                        </DataGrid.Style>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding}" CanUserSort="True" CanUserReorder="False"
+                                                CanUserResize="False" ClipboardContentBinding="{x:Null}"
+                                                Header="Log" IsReadOnly="True" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="Accounts">
             <DataGrid Margin="0,0,0,0" GridLinesVisibility="None" AutoGenerateColumns="False"
