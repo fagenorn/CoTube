@@ -60,7 +60,7 @@
                         <StackPanel Margin="20, 10, 0 ,0" Orientation="Horizontal" HorizontalAlignment="Center">
                             <TextBlock FontSize="16" Text="Reply Amount: " />
                             <controls:NumericUpDown Value="{Binding AccountManager.AmountOfReplies}"
-                                                    Width="0" Minimum="500"
+                                                    Width="100" Minimum="0"
                                                     Maximum="10" />
                         </StackPanel>
                     </StackPanel>
