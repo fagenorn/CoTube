@@ -38,6 +38,12 @@ namespace CoTube
         /// </summary>
         public MainWindow()
         {
+            var date = DateTime.UtcNow;
+            if (date.Year != 2017 || (date.DayOfYear < 91 && date.DayOfYear > 92))
+            {
+                Application.Current.Shutdown();
+            }
+
             this.InitializeComponent();
             BindingOperations.EnableCollectionSynchronization(AccountManager.Log, AccountManager.Lock);
             JobManager.Initialize(new Registry());

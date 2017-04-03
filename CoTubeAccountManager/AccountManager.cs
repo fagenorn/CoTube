@@ -32,6 +32,11 @@ namespace CoTubeAccountManager
             new ObservableCollectionExt<YAccount>(new List<YAccount>());
 
         /// <summary>
+        ///     Gets or sets the amount of replies to post per comment.
+        /// </summary>
+        public static int AmountOfReplies { get; set; } = 4;
+
+        /// <summary>
         ///     Gets or sets the cancellation token source.
         /// </summary>
         public static CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
@@ -42,9 +47,19 @@ namespace CoTubeAccountManager
         public static ObservableCollectionExt<string> Comments { get; } = new ObservableCollectionExt<string>();
 
         /// <summary>
+        ///     Gets or sets the delay before starting to reply.
+        /// </summary>
+        public static int DelayBeforeStartReply { get; set; } = 30000;
+
+        /// <summary>
         ///     Gets or sets the delay between each comment.
         /// </summary>
         public static int DelayBetweenEachComment { get; set; } = 10000;
+
+        /// <summary>
+        ///     Gets or sets the delay between each reply.
+        /// </summary>
+        public static int DelayBetweenEachReply { get; set; } = 7000;
 
         /// <summary>
         ///     The lock.
@@ -245,8 +260,10 @@ namespace CoTubeAccountManager
                                                  this.SubmitCommentId(commentResponse.CommentLink);
                                              }
 
+                                             CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBeforeStartReply);
+
                                              // Reply 5 times to comment with random accounts
-                                             for (var j = 0; j < 5; j++)
+                                             for (var j = 0; j < AmountOfReplies; j++)
                                              {
                                                  var replyAccount = Accounts.RandomItem();
                                                  var reply = Replies.RandomItem();
@@ -254,6 +271,7 @@ namespace CoTubeAccountManager
                                                                     urlToComment,
                                                                     commentResponse.Parameter,
                                                                     reply.SpinIt());
+                                                 CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachReply);
                                              }
                                          }
                                          catch (Exception)
