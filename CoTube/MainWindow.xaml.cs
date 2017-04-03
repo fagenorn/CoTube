@@ -38,12 +38,6 @@ namespace CoTube
         /// </summary>
         public MainWindow()
         {
-            var date = DateTime.UtcNow;
-            if (date.Year != 2017 || (date.DayOfYear < 91 && date.DayOfYear > 92))
-            {
-                Application.Current.Shutdown();
-            }
-
             this.InitializeComponent();
             BindingOperations.EnableCollectionSynchronization(AccountManager.Log, AccountManager.Lock);
             JobManager.Initialize(new Registry());
@@ -584,6 +578,13 @@ namespace CoTube
                 {
                     // No Comments
                     await this.ShowMessageAsync("No Comments", "You need to have atleast one comment.");
+                    return;
+                }
+
+                if (AccountManager.Replies.Count == 0)
+                {
+                    // No Replies
+                    await this.ShowMessageAsync("No Replies", "You need to have atleast one reply.");
                     return;
                 }
 
