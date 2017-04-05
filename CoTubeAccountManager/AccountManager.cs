@@ -7,19 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using UsefullUtilitiesLibrary;
+using UsefullUtilitiesLibrary.CustomList;
+using YoutubeLibrary;
+
 namespace CoTubeAccountManager
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using UsefullUtilitiesLibrary;
-    using UsefullUtilitiesLibrary.CustomList;
-
-    using YoutubeLibrary;
-
     /// <summary>
     ///     The account manager.
     /// </summary>
@@ -199,114 +197,105 @@ namespace CoTubeAccountManager
         {
             var toCommentList = new List<string>(Urls.ToList());
             var options = new ParallelOptions
-                              {
-                                  CancellationToken = CancellationTokenSource.Token,
-                                  MaxDegreeOfParallelism = this.MaxThreads
-                              };
-            var options2 = new ParallelOptions { MaxDegreeOfParallelism = this.MaxThreads };
-            Parallel.ForEach(
-                             Accounts,
-                             options2,
-                             account =>
-                                 {
-                                     try
-                                     {
-                                         lock (Lock)
-                                         {
-                                             AddNewLog($"Logging in - {account.Email}");
-                                         }
+            {
+                CancellationToken = CancellationTokenSource.Token,
+                MaxDegreeOfParallelism = MaxThreads
+            };
+            var options2 = new ParallelOptions {MaxDegreeOfParallelism = MaxThreads};
+            Parallel.ForEach(Accounts, options2, account =>
+            {
+                try
+                {
+                    lock (Lock)
+                    {
+                        AddNewLog($"Logging in - {account.Email}");
+                    }
 
-                                         var response = account.Login();
-                                         if (!response.ChallengeRequired)
-                                         {
-                                             return;
-                                         }
+                    var response = account.Login();
+                    if (!response.ChallengeRequired)
+                    {
+                        return;
+                    }
 
-                                         Accounts.RemoveAll(x => x.Email == account.Email);
+                    Accounts.RemoveAll(x => x.Email == account.Email);
 
-                                         lock (Lock)
-                                         {
-                                             AddNewLog($"Checkpoint required, deleting account - {account.Email}");
-                                         }
-                                     }
-                                     catch (Exception)
-                                     {
-                                         lock (Lock)
-                                         {
-                                             AddNewLog($"Failed to login - {account.Email}");
-                                         }
-                                     }
-                                 });
+                    lock (Lock)
+                    {
+                        AddNewLog($"Checkpoint required, deleting account - {account.Email}");
+                    }
+                }
+                catch (Exception)
+                {
+                    lock (Lock)
+                    {
+                        AddNewLog($"Failed to login - {account.Email}");
+                    }
+                }
+            });
 
-            Parallel.ForEach(
-                             Accounts,
-                             options,
-                             account =>
-                                 {
-                                     CancellationTokenSource.Token.ThrowIfCancellationRequested();
+            Parallel.ForEach(Accounts, options, account =>
+            {
+                CancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-                                     // Start Commenting on 3 Random Videos
-                                     for (var i = 0; i < 3; i++)
-                                     {
-                                         if (toCommentList.Count == 0)
-                                         {
-                                             continue;
-                                         }
+                // Start Commenting on 3 Random Videos
+                for (var i = 0; i < 3; i++)
+                {
+                    if (toCommentList.Count == 0)
+                    {
+                        continue;
+                    }
 
-                                         if (!account.IsLoggedIn())
-                                         {
-                                             lock (Lock)
-                                             {
-                                                 AddNewLog($"Failed to login, deleting account - {account.Email}");
-                                             }
+                    if (!account.IsLoggedIn())
+                    {
+                        lock (Lock)
+                        {
+                            AddNewLog($"Failed to login, deleting account - {account.Email}");
+                        }
 
-                                             Accounts.RemoveAll(x => x.Email == account.Email);
-                                             return;
-                                         }
+                        Accounts.RemoveAll(x => x.Email == account.Email);
+                        return;
+                    }
 
-                                         var urlToComment = toCommentList.RandomItem();
-                                         var comment = Comments.RandomItem();
-                                         lock (Lock)
-                                         {
-                                             AddNewLog($"Commenting on {urlToComment} - {account.Email}");
-                                         }
+                    var urlToComment = toCommentList.RandomItem();
+                    var comment = Comments.RandomItem();
+                    lock (Lock)
+                    {
+                        AddNewLog($"Commenting on {urlToComment} - {account.Email}");
+                    }
 
-                                         try
-                                         {
-                                             var commentResponse = account.Comment(urlToComment, comment.SpinIt());
-                                             if (commentResponse.Success)
-                                             {
-                                                 this.SubmitCommentId(commentResponse.CommentLink);
-                                             }
+                    try
+                    {
+                        var commentResponse = account.Comment(urlToComment, comment.SpinIt());
+                        if (commentResponse.Success)
+                        {
+                            SubmitCommentId(commentResponse.CommentLink);
+                        }
 
-                                             CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBeforeStartReply);
+                        CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBeforeStartReply);
 
-                                             // Reply 5 times to comment with random accounts
-                                             for (var j = 0; j < AmountOfReplies; j++)
-                                             {
-                                                 var replyAccount = Accounts.RandomItem();
-                                                 var reply = Replies.RandomItem();
-                                                 replyAccount.Reply(
-                                                                    urlToComment,
-                                                                    commentResponse.Parameter,
-                                                                    reply.SpinIt());
-                                                 CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachReply);
-                                             }
-                                         }
-                                         catch (Exception)
-                                         {
-                                             AddNewLog($"Failed to Comment - {account.Email}");
-                                             return;
-                                         }
+                        // Reply 5 times to comment with random accounts
+                        for (var j = 0; j < AmountOfReplies; j++)
+                        {
+                            var replyAccount = Accounts.RandomItem();
+                            var reply = Replies.RandomItem();
+                            replyAccount.Reply(urlToComment, commentResponse.Parameter, reply.SpinIt());
+                            CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachReply);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        AddNewLog($"Failed to Comment - {account.Email}");
+                        return;
+                    }
 
-                                         lock (Lock)
-                                         {
-                                             toCommentList.Remove(urlToComment);
-                                         }
+                    lock (Lock)
+                    {
+                        toCommentList.Remove(urlToComment);
+                    }
 
-                                         CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
-                                     }
-                                 });
+                    CancellationTokenSource.Token.WaitHandle.WaitOne(DelayBetweenEachComment);
+                }
+            });
         }
 
         /// <summary>
@@ -317,17 +306,17 @@ namespace CoTubeAccountManager
         /// </param>
         private void SubmitCommentId(string commentLink)
         {
-            if (string.IsNullOrWhiteSpace(this.PanelUsername))
+            if (string.IsNullOrWhiteSpace(PanelUsername))
             {
                 return;
             }
 
             if (!UpvoteManager.IsLoggedIn)
             {
-                UpvoteManager.Login(this.PanelUsername, this.PanelPassword);
+                UpvoteManager.Login(PanelUsername, PanelPassword);
             }
 
-            UpvoteManager.SubmitUpvoteRequest(commentLink, this.PanelUpvoteAmount);
+            UpvoteManager.SubmitUpvoteRequest(commentLink, PanelUpvoteAmount);
         }
     }
 }

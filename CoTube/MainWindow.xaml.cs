@@ -606,7 +606,7 @@ namespace CoTube
                                       s =>
                                           s.NonReentrant()
                                            .ToRunOnceIn(this.AccountManager.AutomaticRestarterTimeout)
-                                           .Seconds());
+                                           .Minutes());
                     AccountManager.AddNewLog(
                                              $"Automatic Scheduler - Next run in {this.AccountManager.AutomaticRestarterTimeout} minute(s)");
                 }
