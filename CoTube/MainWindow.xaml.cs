@@ -7,27 +7,22 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using CoTubeAccountManager;
+using FluentScheduler;
+using MahApps.Metro.Controls.Dialogs;
+using UsefullUtilitiesLibrary;
+using UsefullUtilitiesLibrary.FileManipulation;
+using YoutubeLibrary;
+
 namespace CoTube
 {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Controls;
-    using System.Windows.Data;
-
-    using CoTubeAccountManager;
-
-    using FluentScheduler;
-
-    using MahApps.Metro.Controls.Dialogs;
-
-    using UsefullUtilitiesLibrary;
-    using UsefullUtilitiesLibrary.FileManipulation;
-
-    using YoutubeLibrary;
-
     /// <summary>
     ///     The main window.
     /// </summary>
@@ -38,25 +33,9 @@ namespace CoTube
         /// </summary>
         public MainWindow()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             BindingOperations.EnableCollectionSynchronization(AccountManager.Log, AccountManager.Lock);
             JobManager.Initialize(new Registry());
-        }
-
-        /// <summary>
-        ///     The status.
-        /// </summary>
-        private enum Status
-        {
-            /// <summary>
-            ///     The start.
-            /// </summary>
-            Start,
-
-            /// <summary>
-            ///     The stop.
-            /// </summary>
-            Stop
         }
 
         /// <summary>
@@ -92,17 +71,15 @@ namespace CoTube
         private async void AddNewAccountClick(object sender, RoutedEventArgs e)
         {
             var logindialogsettings = new LoginDialogSettings
-                                          {
-                                              AnimateHide = false,
-                                              AffirmativeButtonText = "Next",
-                                              UsernameWatermark = "Email",
-                                              NegativeButtonVisibility = Visibility.Visible,
-                                              EnablePasswordPreview = true
-                                          };
-            var loginData = await this.ShowLoginAsync(
-                                                      "Add a new account",
-                                                      "Enter the credentials of the account you wish to add.",
-                                                      logindialogsettings);
+            {
+                AnimateHide = false,
+                AffirmativeButtonText = "Next",
+                UsernameWatermark = "Email",
+                NegativeButtonVisibility = Visibility.Visible,
+                EnablePasswordPreview = true
+            };
+            var loginData = await this.ShowLoginAsync("Add a new account",
+                "Enter the credentials of the account you wish to add.", logindialogsettings);
 
             var username = loginData?.Username;
             var password = loginData?.Password;
@@ -119,13 +96,11 @@ namespace CoTube
             }
 
             Proxy tempProxy = null;
-            var mds = new MetroDialogSettings { AnimateHide = false, AnimateShow = false };
+            var mds = new MetroDialogSettings {AnimateHide = false, AnimateShow = false};
 
             // Don't animate hide and show
-            var proxy = await this.ShowInputAsync(
-                                                  "Add Account",
-                                                  "Enter the proxy for the account. (IP:Port) Leave blank for none.",
-                                                  mds);
+            var proxy = await this.ShowInputAsync("Add Account",
+                "Enter the proxy for the account. (IP:Port) Leave blank for none.", mds);
             if (proxy == null)
             {
                 // Check if cancel pressed
@@ -136,19 +111,17 @@ namespace CoTube
             {
                 var credentialsProxy = proxy.Split(':');
                 var lds = new LoginDialogSettings
-                              {
-                                  AnimateHide = false,
-                                  AnimateShow = false,
-                                  EnablePasswordPreview = true,
-                                  AffirmativeButtonText = "Next",
-                                  NegativeButtonVisibility = Visibility.Visible
-                              };
+                {
+                    AnimateHide = false,
+                    AnimateShow = false,
+                    EnablePasswordPreview = true,
+                    AffirmativeButtonText = "Next",
+                    NegativeButtonVisibility = Visibility.Visible
+                };
 
                 // Don't animate hide and show
-                var proxyLogin = await this.ShowLoginAsync(
-                                                           "Add Account",
-                                                           "Enter the credentials of your proxy, or leave blank if not applicable.",
-                                                           lds);
+                var proxyLogin = await this.ShowLoginAsync("Add Account",
+                    "Enter the credentials of your proxy, or leave blank if not applicable.", lds);
                 if (proxyLogin == null)
                 {
                     return;
@@ -171,7 +144,7 @@ namespace CoTube
                 account.Proxy = tempProxy;
             }
 
-            this.AddNewAccount(account);
+            AddNewAccount(account);
         }
 
         /// <summary>
@@ -191,7 +164,7 @@ namespace CoTube
                 return;
             }
 
-            AccountManager.AddNewComment(comment);
+            AccountManager.AddNewComment(comment.Replace("^*", Environment.NewLine));
         }
 
         /// <summary>
@@ -243,18 +216,14 @@ namespace CoTube
         /// </summary>
         private void DeleteAccounts()
         {
-            var selectedItemsList = this.AccountsGrid.SelectedItems.Cast<YAccount>().ToList();
+            var selectedItemsList = AccountsGrid.SelectedItems.Cast<YAccount>().ToList();
             if (selectedItemsList.Count == 0)
             {
                 return;
             }
 
             AccountManager.Accounts.RemoveAll(
-                                              x =>
-                                                  selectedItemsList.Any(
-                                                                        y =>
-                                                                            y.Email.ToLower().Trim()
-                                                                            == x.Email.ToLower().Trim()));
+                x => selectedItemsList.Any(y => y.Email.ToLower().Trim() == x.Email.ToLower().Trim()));
         }
 
         /// <summary>
@@ -268,7 +237,7 @@ namespace CoTube
         /// </param>
         private void DeleteAccountsClick(object sender, RoutedEventArgs e)
         {
-            this.DeleteAccounts();
+            DeleteAccounts();
         }
 
         /// <summary>
@@ -276,13 +245,14 @@ namespace CoTube
         /// </summary>
         private void DeleteComments()
         {
-            var selectedItemsList = this.CommentsGrid.SelectedItems.Cast<string>().ToList();
+            var selectedItemsList = CommentsGrid.SelectedItems.Cast<string>().ToList();
             if (selectedItemsList.Count == 0)
             {
                 return;
             }
 
-            AccountManager.Comments.RemoveAll(x => selectedItemsList.Any(y => y.ToLower().Trim() == x.ToLower().Trim()));
+            AccountManager.Comments.RemoveAll(
+                x => selectedItemsList.Any(y => y.ToLower().Trim() == x.ToLower().Trim()));
         }
 
         /// <summary>
@@ -296,7 +266,7 @@ namespace CoTube
         /// </param>
         private void DeleteCommentsClick(object sender, RoutedEventArgs e)
         {
-            this.DeleteComments();
+            DeleteComments();
         }
 
         /// <summary>
@@ -304,7 +274,7 @@ namespace CoTube
         /// </summary>
         private void DeleteReplies()
         {
-            var selectedItemsList = this.RepliesGrid.SelectedItems.Cast<string>().ToList();
+            var selectedItemsList = RepliesGrid.SelectedItems.Cast<string>().ToList();
             if (selectedItemsList.Count == 0)
             {
                 return;
@@ -324,7 +294,7 @@ namespace CoTube
         /// </param>
         private void DeleteRepliesClick(object sender, RoutedEventArgs e)
         {
-            this.DeleteReplies();
+            DeleteReplies();
         }
 
         /// <summary>
@@ -332,7 +302,7 @@ namespace CoTube
         /// </summary>
         private void DeleteUrls()
         {
-            var selectedItemsList = this.UrlsGrid.SelectedItems.Cast<string>().ToList();
+            var selectedItemsList = UrlsGrid.SelectedItems.Cast<string>().ToList();
             if (selectedItemsList.Count == 0)
             {
                 return;
@@ -352,7 +322,7 @@ namespace CoTube
         /// </param>
         private void DeleteUrlsClick(object sender, RoutedEventArgs e)
         {
-            this.DeleteUrls();
+            DeleteUrls();
         }
 
         /// <summary>
@@ -369,7 +339,7 @@ namespace CoTube
         /// </exception>
         private void GridContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            var grid = (DataGrid)sender;
+            var grid = (DataGrid) sender;
             var cm = grid.ContextMenu;
             if (cm == null)
             {
@@ -385,7 +355,7 @@ namespace CoTube
                     continue;
                 }
 
-                var status = (DataGridHelper.WhenEnabled)menuItem.GetValue(DataGridHelper.MenuEnabledWhenProperty);
+                var status = (DataGridHelper.WhenEnabled) menuItem.GetValue(DataGridHelper.MenuEnabledWhenProperty);
                 switch (status)
                 {
                     case DataGridHelper.WhenEnabled.Always:
@@ -434,10 +404,8 @@ namespace CoTube
                 }
                 else if (accountProxy.Ip != null)
                 {
-                    tempProxy = new Proxy(
-                                          accountProxy.Ip,
-                                          accountProxy.Port,
-                                          new Credentials(accountProxy.ProxyUser, accountProxy.ProxyPass));
+                    tempProxy = new Proxy(accountProxy.Ip, accountProxy.Port,
+                        new Credentials(accountProxy.ProxyUser, accountProxy.ProxyPass));
                 }
 
                 var account = new YAccount(accountProxy.Username, accountProxy.Password);
@@ -446,7 +414,7 @@ namespace CoTube
                     account.Proxy = tempProxy;
                 }
 
-                this.AddNewAccount(account);
+                AddNewAccount(account);
             }
         }
 
@@ -470,12 +438,7 @@ namespace CoTube
             var list = FileDialogHelper.ReadPerLine(path);
             foreach (var line in list)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    continue;
-                }
-
-                AccountManager.AddNewComment(line);
+                AccountManager.AddNewComment(line.Replace("^*", Environment.NewLine));
             }
         }
 
@@ -554,7 +517,7 @@ namespace CoTube
         {
             if (status == Status.Start)
             {
-                if (this.IsBusy)
+                if (IsBusy)
                 {
                     AccountManager.AddNewLog($"Can't Start - Automatic Scheduler Is Running.");
                     return;
@@ -588,27 +551,22 @@ namespace CoTube
                     return;
                 }
 
-                this.IsBusy = true;
+                IsBusy = true;
                 AccountManager.CancellationTokenSource.Dispose();
                 AccountManager.CancellationTokenSource = new CancellationTokenSource();
                 try
                 {
-                    await Task.Factory.StartNew(
-                                                this.AccountManager.StartCommentingProcess,
-                                                AccountManager.CancellationTokenSource.Token);
-                    if (!this.AccountManager.AutomaticRestarter)
+                    await Task.Factory.StartNew(AccountManager.StartCommentingProcess,
+                        AccountManager.CancellationTokenSource.Token);
+                    if (!AccountManager.AutomaticRestarter)
                     {
                         return;
                     }
 
-                    JobManager.AddJob(
-                                      async () => await this.StartAccountManager(Status.Start),
-                                      s =>
-                                          s.NonReentrant()
-                                           .ToRunOnceIn(this.AccountManager.AutomaticRestarterTimeout)
-                                           .Minutes());
+                    JobManager.AddJob(async () => await StartAccountManager(Status.Start),
+                        s => s.NonReentrant().ToRunOnceIn(AccountManager.AutomaticRestarterTimeout).Minutes());
                     AccountManager.AddNewLog(
-                                             $"Automatic Scheduler - Next run in {this.AccountManager.AutomaticRestarterTimeout} minute(s)");
+                        $"Automatic Scheduler - Next run in {AccountManager.AutomaticRestarterTimeout} minute(s)");
                 }
                 catch (Exception exception)
                 {
@@ -616,7 +574,7 @@ namespace CoTube
                 }
                 finally
                 {
-                    this.IsBusy = false;
+                    IsBusy = false;
                 }
             }
             else
@@ -636,17 +594,33 @@ namespace CoTube
         /// </param>
         private async void StartAccountManagerClick(object sender, RoutedEventArgs e)
         {
-            var textButton = (TextBlock)((Button)sender).Content;
+            var textButton = (TextBlock) ((Button) sender).Content;
             if (textButton.Text == "Start")
             {
                 textButton.Text = "Stop";
-                await this.StartAccountManager(Status.Start);
+                await StartAccountManager(Status.Start);
                 textButton.Text = "Start";
             }
             else
             {
-                await this.StartAccountManager(Status.Stop);
+                await StartAccountManager(Status.Stop);
             }
+        }
+
+        /// <summary>
+        ///     The status.
+        /// </summary>
+        private enum Status
+        {
+            /// <summary>
+            ///     The start.
+            /// </summary>
+            Start,
+
+            /// <summary>
+            ///     The stop.
+            /// </summary>
+            Stop
         }
     }
 }
