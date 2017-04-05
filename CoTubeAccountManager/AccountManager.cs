@@ -211,18 +211,18 @@ namespace CoTubeAccountManager
                         AddNewLog($"Logging in - {account.Email}");
                     }
 
-                    var response = account.Login();
-                    if (!response.ChallengeRequired)
+                    account.Login();
+
+                    if (account.IsLoggedIn())
                     {
                         return;
                     }
-
-                    Accounts.RemoveAll(x => x.Email == account.Email);
-
                     lock (Lock)
                     {
-                        AddNewLog($"Checkpoint required, deleting account - {account.Email}");
+                        AddNewLog($"Failed to login, deleting account - {account.Email}");
                     }
+
+                    Accounts.RemoveAll(x => x.Email == account.Email);
                 }
                 catch (Exception)
                 {
@@ -233,7 +233,9 @@ namespace CoTubeAccountManager
                 }
             });
 
-            Parallel.ForEach(Accounts, options, account =>
+            var vidsPerAccount = Convert.ToInt32(Math.Floor(toCommentList.Count / (float) Accounts.Count));
+
+            Parallel.ForEach(Accounts, options, (account, state, index) =>
             {
                 CancellationTokenSource.Token.ThrowIfCancellationRequested();
 
@@ -245,18 +247,8 @@ namespace CoTubeAccountManager
                         continue;
                     }
 
-                    if (!account.IsLoggedIn())
-                    {
-                        lock (Lock)
-                        {
-                            AddNewLog($"Failed to login, deleting account - {account.Email}");
-                        }
-
-                        Accounts.RemoveAll(x => x.Email == account.Email);
-                        return;
-                    }
-
-                    var urlToComment = toCommentList.RandomItem();
+                    var urlToComment = toCommentList.GetRange(Convert.ToInt32(index) * vidsPerAccount, vidsPerAccount).
+                        RandomItem();
                     var comment = Comments.RandomItem();
                     lock (Lock)
                     {
