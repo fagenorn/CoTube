@@ -31,15 +31,13 @@ namespace CoTubeAccountManager
         /// <summary>
         ///     The comment site service.
         /// </summary>
-        private static string CommentSite => "http://www.youtubecommenter.com/panel/";
+        private static string CommentSite => "http://youtubecommenter.com/panel/";
 
         /// <summary>
         ///     The user agent. Can't be static, since site doesn't perform any special checks.
         /// </summary>
-        private static string UserAgent
-            =>
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.110 Safari/537.36"
-        ;
+        private static string UserAgent =>
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
 
         /// <summary>
         ///     Login into panel.
@@ -53,10 +51,14 @@ namespace CoTubeAccountManager
         public static void Login(string username, string password)
         {
             var body =
-                $"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}&submit=login";
+                $"username={WebUtility.UrlEncode(username)}&password={WebUtility.UrlEncode(password)}";
 
-            LoginRequest();
+            SimpleRequest("http://youtubecommenter.com/panel/");
             LoginRequest(body, true);
+            SimpleRequest("http://youtubecommenter.com/panel/api/user.php");
+            SimpleRequest("http://youtubecommenter.com/panel/api/tasks.php");
+            SimpleRequest("http://youtubecommenter.com/panel/api/notice.php");
+            SimpleRequest("http://youtubecommenter.com/panel/api/time.php");
 
             IsLoggedIn = true;
 
@@ -87,17 +89,19 @@ namespace CoTubeAccountManager
                 throw new ArgumentException("Need to login into panel first.");
             }
 
-            var body = $"url={WebUtility.UrlEncode(url)}&value={amount}";
+            var body = $"urls={WebUtility.UrlEncode(url)}&value={amount}";
 
-            var request = (HttpWebRequest)WebRequest.Create($"{CommentSite}index.php");
+            var request = (HttpWebRequest)WebRequest.Create($"{CommentSite}api/tasks.php");
 
             request.UserAgent = UserAgent;
             request.CookieContainer = Cookies;
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            request.Accept = "application/json, text/plain, */*";
+            request.Referer = "http://youtubecommenter.com/panel/";
             request.Headers.Add("Accept-Encoding", "gzip, deflate");
             request.Headers.Add("Accept-Language", "en-US,en;q=0.8,nl;q=0.6");
             request.Headers.Add("DNT", "1");
+            request.Headers.Add("Origin", "http://youtubecommenter.com");
 
             request.Method = "POST";
 
@@ -113,6 +117,10 @@ namespace CoTubeAccountManager
             using ((HttpWebResponse)request.GetResponse())
             {
             }
+
+            SimpleRequest($"{CommentSite}api/user.php");
+            SimpleRequest($"{CommentSite}api/tasks.php");
+            SimpleRequest($"{CommentSite}api/notice.php");
         }
 
         /// <summary>
@@ -126,11 +134,14 @@ namespace CoTubeAccountManager
         /// </param>
         private static void LoginRequest(string body = "", bool post = false)
         {
-            var request = (HttpWebRequest)WebRequest.Create($"{CommentSite}login.php");
+            var url = CommentSite;
+            url += post ? "api/login.php" : string.Empty;
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
             request.UserAgent = UserAgent;
             request.CookieContainer = Cookies;
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
+            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
+            request.Accept = "application/json, text/plain, */*";
             request.Headers.Add("Accept-Encoding", "gzip, deflate");
             request.Headers.Add("Accept-Language", "en-US,en;q=0.8,nl;q=0.6");
             request.Headers.Add("DNT", "1");
@@ -147,6 +158,29 @@ namespace CoTubeAccountManager
                     requestStream.Write(bytes, 0, bytes.Length);
                 }
             }
+
+            // Receive Response
+            using ((HttpWebResponse)request.GetResponse())
+            {
+            }
+        }
+
+        /// <summary>
+        ///     The simple request.
+        /// </summary>
+        /// <param name="url">
+        ///     The url.
+        /// </param>
+        private static void SimpleRequest(string url)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.UserAgent = UserAgent;
+            request.CookieContainer = Cookies;
+            request.Referer = "http://youtubecommenter.com/panel/";
+            request.Accept = "application/json, text/plain, */*";
+            request.Headers.Add("Accept-Language", "en-US,en;q=0.8,nl;q=0.6");
+            request.Headers.Add("DNT", "1");
+            request.Headers.Add("Accept-Encoding", "gzip, deflate");
 
             // Receive Response
             using ((HttpWebResponse)request.GetResponse())

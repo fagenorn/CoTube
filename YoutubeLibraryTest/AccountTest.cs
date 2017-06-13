@@ -28,9 +28,9 @@ namespace YoutubeLibraryTest
             const string Email = "donaldducktrumpmaker@gmail.com";
             const string Password = "celementoni";
             var account = new YAccount(Email, Password);
-            const string VideoUrl = "https://www.youtube.com/watch?v=xt544bCPqAw";
+            const string VideoUrl = "https://www.youtube.com/watch?v=O42rOvv-1bk";
             account.Login();
-            var response = account.Comment(VideoUrl, "LoL, I can't stop listening.");
+            var response = account.Comment(VideoUrl, "LoL, I can't stop laughing.");
 
             Assert.IsTrue(response.Success);
             Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));
@@ -59,9 +59,9 @@ namespace YoutubeLibraryTest
             const string Email = "donaldducktrumpmaker@gmail.com";
             const string Password = "celementoni";
             var account = new YAccount(Email, Password);
-            const string VideoUrl = "https://www.youtube.com/watch?v=RAF7ufz47t8";
+            const string VideoUrl = "https://www.youtube.com/watch?v=O42rOvv-1bk";
             account.Login();
-            var response = account.Comment(VideoUrl, "Meg is pretty cool");
+            var response = account.Comment(VideoUrl, "Elise is pretty cool");
             Assert.IsTrue(response.Success);
             Assert.IsFalse(string.IsNullOrWhiteSpace(response.CommentId));
             response = account.Reply(VideoUrl, response.Parameter, ":P");

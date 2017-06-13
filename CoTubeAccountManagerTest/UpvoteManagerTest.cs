@@ -26,11 +26,11 @@ namespace CoTubeAccountManagerTest
         public void LoginIntoPanelAndPostYouTubeUrl()
         {
             Assert.IsFalse(UpvoteManager.IsLoggedIn);
-            UpvoteManager.Login("mydbenouazzane@gmail.com", "eo1k87b7DY");
+            UpvoteManager.Login("x9.102934@gmail.com", "9NazD802jz");
             Assert.IsTrue(UpvoteManager.IsLoggedIn);
             UpvoteManager.SubmitUpvoteRequest(
-                                              "https://www.youtube.com/watch?v=xt544bCPqAw&lc=z122vtbghzubdzcg004cflzi1sriifzr3pw0k",
-                                              20);
+                "https://www.youtube.com/watch?v=O42rOvv-1bk&lc=z13agph4zrbdcbp0q23yuzqbnuvpwdmux",
+                15);
         }
     }
 }
